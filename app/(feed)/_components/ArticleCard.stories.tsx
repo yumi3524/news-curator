@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import ArticleCard from "./ArticleCard";
 
 /**
@@ -42,15 +42,13 @@ export const Default: Story = {
     article: {
       id: "1",
       title: "React 19の新機能と破壊的変更の完全ガイド",
-      description:
-        "React 19で導入される新しいフック、Server Components、そして注意すべき破壊的変更について詳しく解説します。",
+      description: "",
       url: "https://example.com/article/1",
       publishedAt: "2024-11-20T10:00:00Z",
       source: {
         id: "tech-blog",
         name: "Tech Blog",
       },
-      author: "山田太郎",
       tags: ["React", "JavaScript", "Frontend"],
       isFavorite: false,
     },

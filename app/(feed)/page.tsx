@@ -1,62 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import ArticleCard from "./_components/ArticleCard";
+import FilterPanel from "./_components/FilterPanel";
 import { Article } from "@/app/types/types";
+import { getArticles } from "@/app/data/mockData";
+import {
+  filterArticles,
+  extractUniqueSources,
+  extractUniqueTags,
+  type FilterOptions,
+} from "@/app/lib/filterArticles";
 
 /**
- * フィードページの使用例
- * ArticleCardコンポーネントの実装サンプル
+ * フィードページ
+ * フィルタ機能付きの記事一覧を表示
  */
 export default function FeedPage() {
-  // サンプル記事データ
-  const [articles, setArticles] = useState<Article[]>([
-    {
-      id: "1",
-      title: "React 19の新機能と破壊的変更の完全ガイド",
-      description:
-        "React 19で導入される新しいフック、Server Components、そして注意すべき破壊的変更について詳しく解説します。",
-      url: "https://example.com/article/1",
-      publishedAt: "2024-11-20T10:00:00Z",
-      source: {
-        id: "tech-blog",
-        name: "Tech Blog",
-      },
-      author: "山田太郎",
-      tags: ["React", "JavaScript", "Frontend"],
-      isFavorite: false,
-    },
-    {
-      id: "2",
-      title: "Next.js 15 App Routerのパフォーマンス最適化テクニック",
-      description:
-        "App Routerを使用したNext.jsアプリケーションのパフォーマンスを最大化するための実践的なテクニックを紹介します。",
-      url: "https://example.com/article/2",
-      publishedAt: "2024-11-19T14:30:00Z",
-      source: {
-        id: "dev-community",
-        name: "Dev Community",
-      },
-      author: "佐藤花子",
-      tags: ["Next.js", "Performance", "React"],
-      isFavorite: true,
-    },
-    {
-      id: "3",
-      title: "TypeScript 5.3の新機能：型安全性の向上",
-      description:
-        "TypeScript 5.3で追加された新しい型システムの機能と、より安全なコードを書くためのベストプラクティス。",
-      url: "https://example.com/article/3",
-      publishedAt: "2024-11-18T09:15:00Z",
-      source: {
-        id: "typescript-weekly",
-        name: "TypeScript Weekly",
-      },
-      author: "鈴木一郎",
-      tags: ["TypeScript", "JavaScript", "Type Safety"],
-      isFavorite: false,
-    },
-  ]);
+  // モックデータから記事を取得（お気に入り状態を初期化）
+  const initialArticles = getArticles().map((article) => ({
+    ...article,
+    isFavorite: false,
+  }));
+
+  const [articles, setArticles] = useState<Article[]>(initialArticles);
+
+  // フィルタ状態
+  const [filters, setFilters] = useState<FilterOptions>({
+    selectedSources: [],
+    selectedTags: [],
+    searchKeyword: "",
+  });
+
+  // 利用可能なソースとタグ（全記事から抽出）
+  const availableSources = useMemo(
+    () => extractUniqueSources(articles),
+    [articles]
+  );
+  const availableTags = useMemo(() => extractUniqueTags(articles), [articles]);
+
+  // フィルタリングされた記事
+  const filteredArticles = useMemo(
+    () => filterArticles(articles, filters),
+    [articles, filters]
+  );
 
   /**
    * お気に入りトグルハンドラ
@@ -78,45 +65,61 @@ export default function FeedPage() {
       <header className="border-b border-gray-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            フィード - ArticleCard使用例
+            技術記事キュレーション
           </h1>
           <p className="mt-2 text-gray-600">
-            お気に入り機能付きの記事カードコンポーネントのデモ
+            最新の技術記事をフィルタリングして閲覧
           </p>
         </div>
       </header>
 
       {/* メインコンテンツ */}
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* 記事グリッド */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {articles.map((article) => (
-            <ArticleCard
-              key={article.id}
-              article={article}
-              onToggleFavorite={handleToggleFavorite}
-            />
-          ))}
-        </div>
+        <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
+          {/* フィルタパネル */}
+          <aside>
+            <div className="sticky top-8">
+              <FilterPanel
+                availableSources={availableSources}
+                availableTags={availableTags}
+                filters={filters}
+                onFiltersChange={setFilters}
+              />
+            </div>
+          </aside>
 
-        {/* 使用方法の説明 */}
-        <div className="mt-12 rounded-lg border border-gray-200 bg-white p-6">
-          <h2 className="mb-4 text-xl font-bold text-gray-900">
-            使用方法
-          </h2>
-          <div className="space-y-4 text-sm text-gray-600">
-            <p>
-              <strong>お気に入りボタン:</strong>{" "}
-              各カードの右上にあるハートアイコンをクリックすると、お気に入り状態が切り替わります。
-            </p>
-            <p>
-              <strong>記事リンク:</strong>{" "}
-              カードをクリックすると、新しいタブで記事が開きます。
-            </p>
-            <p>
-              <strong>レスポンシブ:</strong>{" "}
-              画面サイズに応じて、1列、2列、3列のグリッドレイアウトに自動調整されます。
-            </p>
+          {/* 記事リスト */}
+          <div>
+            {/* 結果表示 */}
+            <div className="mb-6">
+              <p className="text-sm text-gray-600">
+                {filteredArticles.length}件の記事が見つかりました
+                {filteredArticles.length !== articles.length &&
+                  ` (全${articles.length}件中)`}
+              </p>
+            </div>
+
+            {/* 記事グリッド */}
+            {filteredArticles.length > 0 ? (
+              <div className="grid gap-6 sm:grid-cols-2">
+                {filteredArticles.map((article) => (
+                  <ArticleCard
+                    key={article.id}
+                    article={article}
+                    onToggleFavorite={handleToggleFavorite}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-lg border border-gray-200 bg-white p-12 text-center">
+                <p className="text-gray-600">
+                  条件に一致する記事が見つかりませんでした。
+                </p>
+                <p className="mt-2 text-sm text-gray-500">
+                  フィルタ条件を変更してお試しください。
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </main>
