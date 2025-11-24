@@ -1,34 +1,33 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import ArticleCard from "../ArticleCard";
 import { Article } from "@/app/types/types";
 
+// contextはdescribeのエイリアス
+const context = describe;
+
 /**
  * ArticleCardコンポーネントのテスト
- * 
- * テストの観点:
- * 1. 基本的なレンダリング（タイトル、ソース、日付、タグが表示される）
- * 2. お気に入りボタンの動作（クリックでコールバックが呼ばれる）
- * 3. お気に入り状態の表示切り替え
- * 4. 外部リンクの動作
  */
-describe("ArticleCard", () => {
-  // テスト用のモックデータ
-  const mockArticle: Article = {
-    id: "1",
-    title: "React 19の新機能",
-    description: "React 19で導入される新機能について解説します",
-    url: "https://example.com/article/1",
-    publishedAt: "2024-11-20T10:00:00Z",
-    source: {
-      id: "tech-blog",
-      name: "Tech Blog",
-    },
-    author: "山田太郎",
-    tags: ["React", "JavaScript", "Frontend"],
-    isFavorite: false,
-  };
 
+// テストヘルパー: モック記事データを生成
+const createMockArticle = (overrides: Partial<Article> = {}): Article => ({
+  id: "1",
+  title: "React 19の新機能",
+  description: "React 19で導入される新機能について解説します",
+  url: "https://example.com/article/1",
+  publishedAt: "2024-11-20T10:00:00Z",
+  source: {
+    id: "tech-blog",
+    name: "Tech Blog",
+  },
+  author: "山田太郎",
+  tags: ["React", "JavaScript", "Frontend"],
+  isFavorite: false,
+  ...overrides,
+});
+
+describe("ArticleCard", () => {
   const mockOnToggleFavorite = vi.fn();
 
   // 各テストの前にモック関数をリセット
@@ -36,117 +35,126 @@ describe("ArticleCard", () => {
     mockOnToggleFavorite.mockClear();
   });
 
-  it("記事のタイトルが表示される", () => {
-    render(
+  // テストヘルパー: ArticleCardをレンダリング
+  const renderArticleCard = (articleOverrides: Partial<Article> = {}) => {
+    const article = createMockArticle(articleOverrides);
+    return render(
       <ArticleCard
-        article={mockArticle}
+        article={article}
         onToggleFavorite={mockOnToggleFavorite}
       />
     );
+  };
 
-    expect(screen.getByTestId("article-title")).toHaveTextContent(
-      "React 19の新機能"
-    );
+  describe("基本表示", () => {
+    context("通常の記事データの場合", () => {
+      it("記事タイトルが表示されること", () => {
+        renderArticleCard({ title: "React 19の新機能" });
+
+        expect(screen.getByTestId("article-title")).toHaveTextContent(
+          "React 19の新機能"
+        );
+      });
+
+      it("ソース名が表示されること", () => {
+        renderArticleCard();
+
+        const meta = screen.getByTestId("article-meta");
+        expect(meta).toHaveTextContent("Tech Blog");
+      });
+
+      it("公開日が表示されること", () => {
+        renderArticleCard();
+
+        const meta = screen.getByTestId("article-meta");
+        expect(meta).toHaveTextContent("2024年11月20日");
+      });
+    });
   });
 
-  it("ソース名と公開日が表示される", () => {
-    render(
-      <ArticleCard
-        article={mockArticle}
-        onToggleFavorite={mockOnToggleFavorite}
-      />
-    );
+  describe("タグ表示", () => {
+    context("タグが設定されている場合", () => {
+      it("すべてのタグが表示されること", () => {
+        renderArticleCard({ tags: ["React", "JavaScript", "Frontend"] });
 
-    const meta = screen.getByTestId("article-meta");
-    expect(meta).toHaveTextContent("Tech Blog");
-    expect(meta).toHaveTextContent("2024年11月20日");
+        const tags = screen.getByTestId("article-tags");
+        expect(tags).toHaveTextContent("React");
+        expect(tags).toHaveTextContent("JavaScript");
+        expect(tags).toHaveTextContent("Frontend");
+      });
+    });
+
+    context("タグが空の場合", () => {
+      it("タグセクションが表示されないこと", () => {
+        renderArticleCard({ tags: [] });
+
+        expect(screen.queryByTestId("article-tags")).not.toBeInTheDocument();
+      });
+    });
   });
 
-  it("タグが全て表示される", () => {
-    render(
-      <ArticleCard
-        article={mockArticle}
-        onToggleFavorite={mockOnToggleFavorite}
-      />
-    );
+  describe("お気に入り機能", () => {
+    context("お気に入り未登録の場合", () => {
+      it("枠線ハートアイコンが表示されること", () => {
+        renderArticleCard({ isFavorite: false });
 
-    const tags = screen.getByTestId("article-tags");
-    expect(tags).toHaveTextContent("React");
-    expect(tags).toHaveTextContent("JavaScript");
-    expect(tags).toHaveTextContent("Frontend");
+        const favoriteButton = screen.getByTestId("favorite-button");
+        expect(favoriteButton).toHaveAttribute(
+          "aria-label",
+          "お気に入りに追加"
+        );
+      });
+
+      it("お気に入りボタンをクリックするとコールバックが呼ばれること", () => {
+        renderArticleCard({ isFavorite: false });
+
+        const favoriteButton = screen.getByTestId("favorite-button");
+        fireEvent.click(favoriteButton);
+
+        expect(mockOnToggleFavorite).toHaveBeenCalledTimes(1);
+        expect(mockOnToggleFavorite).toHaveBeenCalledWith("1");
+      });
+    });
+
+    context("お気に入り登録済みの場合", () => {
+      it("塗りつぶしハートアイコンが表示されること", () => {
+        renderArticleCard({ isFavorite: true });
+
+        const favoriteButton = screen.getByTestId("favorite-button");
+        expect(favoriteButton).toHaveAttribute(
+          "aria-label",
+          "お気に入りから削除"
+        );
+      });
+
+      it("お気に入りボタンをクリックするとコールバックが呼ばれること", () => {
+        renderArticleCard({ isFavorite: true });
+
+        const favoriteButton = screen.getByTestId("favorite-button");
+        fireEvent.click(favoriteButton);
+
+        expect(mockOnToggleFavorite).toHaveBeenCalledTimes(1);
+        expect(mockOnToggleFavorite).toHaveBeenCalledWith("1");
+      });
+    });
   });
 
-  it("お気に入りボタンをクリックするとコールバックが呼ばれる", () => {
-    render(
-      <ArticleCard
-        article={mockArticle}
-        onToggleFavorite={mockOnToggleFavorite}
-      />
-    );
+  describe("外部リンク", () => {
+    context("記事URLが設定されている場合", () => {
+      it("記事タイトルに正しいリンクが設定されていること", () => {
+        renderArticleCard({ url: "https://example.com/article/1" });
 
-    const favoriteButton = screen.getByTestId("favorite-button");
-    fireEvent.click(favoriteButton);
+        const link = screen.getByRole("link");
+        expect(link).toHaveAttribute("href", "https://example.com/article/1");
+      });
 
-    expect(mockOnToggleFavorite).toHaveBeenCalledTimes(1);
-    expect(mockOnToggleFavorite).toHaveBeenCalledWith("1");
-  });
+      it("リンクが新しいタブで開くように設定されていること", () => {
+        renderArticleCard();
 
-  it("お気に入り未登録の場合、枠線ハートが表示される", () => {
-    render(
-      <ArticleCard
-        article={mockArticle}
-        onToggleFavorite={mockOnToggleFavorite}
-      />
-    );
-
-    const favoriteButton = screen.getByTestId("favorite-button");
-    expect(favoriteButton).toHaveAttribute(
-      "aria-label",
-      "お気に入りに追加"
-    );
-  });
-
-  it("お気に入り登録済みの場合、塗りつぶしハートが表示される", () => {
-    const favoriteArticle = { ...mockArticle, isFavorite: true };
-
-    render(
-      <ArticleCard
-        article={favoriteArticle}
-        onToggleFavorite={mockOnToggleFavorite}
-      />
-    );
-
-    const favoriteButton = screen.getByTestId("favorite-button");
-    expect(favoriteButton).toHaveAttribute(
-      "aria-label",
-      "お気に入りから削除"
-    );
-  });
-
-  it("記事タイトルのリンクが正しいURLを指している", () => {
-    render(
-      <ArticleCard
-        article={mockArticle}
-        onToggleFavorite={mockOnToggleFavorite}
-      />
-    );
-
-    const link = screen.getByRole("link");
-    expect(link).toHaveAttribute("href", "https://example.com/article/1");
-    expect(link).toHaveAttribute("target", "_blank");
-    expect(link).toHaveAttribute("rel", "noopener noreferrer");
-  });
-
-  it("タグが空の場合、タグセクションが表示されない", () => {
-    const articleWithoutTags = { ...mockArticle, tags: [] };
-
-    render(
-      <ArticleCard
-        article={articleWithoutTags}
-        onToggleFavorite={mockOnToggleFavorite}
-      />
-    );
-
-    expect(screen.queryByTestId("article-tags")).not.toBeInTheDocument();
+        const link = screen.getByRole("link");
+        expect(link).toHaveAttribute("target", "_blank");
+        expect(link).toHaveAttribute("rel", "noopener noreferrer");
+      });
+    });
   });
 });
