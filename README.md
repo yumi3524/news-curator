@@ -1,36 +1,174 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# News Curator - 技術記事キュレーション
 
-## Getting Started
+最新の技術記事を厳選してお届けするキュレーションプラットフォーム
 
-First, run the development server:
+## 🚀 特徴
+
+- **モダンな技術スタック**: Next.js 16 (App Router) + TypeScript + Tailwind CSS v4
+- **レスポンシブデザイン**: モバイル、タブレット、デスクトップに対応
+- **高速なページ遷移**: Next.js App Routerによる最適化されたルーティング
+- **型安全**: TypeScriptによる堅牢な型定義
+
+## 📋 前提条件
+
+- Node.js 18.x 以上
+- pnpm (推奨) または npm
+
+## 🛠️ セットアップ
+
+### インストール
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# 依存関係のインストール
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 開発サーバーの起動
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+ブラウザで [http://localhost:3000](http://localhost:3000) を開いてアプリケーションを確認できます。
 
-## Learn More
+### ビルド
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# プロダクションビルド
+pnpm build
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# ビルドしたアプリケーションの起動
+pnpm start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Lint
 
-## Deploy on Vercel
+```bash
+pnpm lint
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📁 プロジェクト構造
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+news-curator/
+├── app/
+│   ├── articles/
+│   │   └── [id]/
+│   │       └── page.tsx          # 記事詳細ページ（動的ルーティング）
+│   ├── components/
+│   │   ├── ArticleCard.tsx       # 記事カードコンポーネント
+│   │   ├── ArticleList.tsx       # 記事一覧コンポーネント
+│   │   └── Header.tsx            # ヘッダーコンポーネント
+│   ├── data/
+│   │   └── mockData.ts           # モックデータ
+│   ├── types/
+│   │   └── types.ts              # TypeScript型定義
+│   ├── globals.css               # グローバルスタイル
+│   ├── layout.tsx                # ルートレイアウト
+│   └── page.tsx                  # トップページ（記事一覧）
+├── public/                       # 静的ファイル
+└── docs/                         # ドキュメント
+    └── API_INTEGRATION.md        # API統合ガイド
+```
+
+## 🎨 主要コンポーネント
+
+### ArticleCard
+
+記事カードを表示するコンポーネント。サムネイル画像、タイトル、説明文、タグ、メタ情報を含みます。
+
+```tsx
+import ArticleCard from "./components/ArticleCard";
+
+<ArticleCard article={article} />
+```
+
+### ArticleList
+
+記事一覧をグリッドレイアウトで表示するコンポーネント。レスポンシブ対応。
+
+```tsx
+import ArticleList from "./components/ArticleList";
+
+<ArticleList articles={articles} />
+```
+
+### Header
+
+アプリケーションのヘッダー。ロゴとナビゲーションを含みます。
+
+```tsx
+import Header from "./components/Header";
+
+<Header />
+```
+
+## 🔄 API統合について
+
+現在はモックデータ（`app/data/mockData.ts`）を使用していますが、将来的に外部APIと統合することを想定した設計になっています。
+
+詳細は [API統合ガイド](./docs/API_INTEGRATION.md) を参照してください。
+
+### モックデータの構造
+
+```typescript
+interface Article {
+  id: string;
+  title: string;
+  description: string;
+  url: string;
+  publishedAt: string;
+  source: ArticleSource;
+  author?: string;
+  tags: string[];
+  imageUrl?: string;
+}
+```
+
+## 🎯 今後の拡張予定
+
+- [ ] 記事の検索機能
+- [ ] タグによるフィルタリング
+- [ ] お気に入り機能
+- [ ] 外部API統合（News API、RSS等）
+- [ ] ダークモード対応
+- [ ] ページネーション
+- [ ] ソート機能（日付、人気度等）
+
+## 📝 開発ガイドライン
+
+### コーディング規約
+
+- **TypeScript**: 型定義を必ず行う
+- **コンポーネント**: 単一責任の原則に従う
+- **スタイリング**: Tailwind CSSのユーティリティクラスを使用
+- **命名規則**: 
+  - コンポーネント: PascalCase
+  - 関数・変数: camelCase
+  - 定数: UPPER_SNAKE_CASE
+
+### コミット規約
+
+```
+feat: 新機能
+fix: バグ修正
+docs: ドキュメント更新
+style: コードスタイルの変更
+refactor: リファクタリング
+test: テスト追加・修正
+chore: ビルドプロセス等の変更
+```
+
+## 🤝 コントリビューション
+
+プルリクエストを歓迎します。大きな変更の場合は、まずissueを開いて変更内容を議論してください。
+
+## 📄 ライセンス
+
+MIT
+
+## 🙏 謝辞
+
+- [Next.js](https://nextjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Unsplash](https://unsplash.com/) - サムネイル画像

@@ -1,22 +1,62 @@
 "use client";
 
 import { useState } from "react";
-import ArticleCard from "./(feed)/_components/ArticleCard";
+import ArticleCard from "./_components/ArticleCard";
 import { Article } from "@/app/types/types";
-import { getArticles } from "@/app/data/mockData";
 
 /**
  * フィードページの使用例
  * ArticleCardコンポーネントの実装サンプル
  */
 export default function FeedPage() {
-  // 既存のモックデータを使用
-  const initialArticles = getArticles().map((article) => ({
-    ...article,
-    isFavorite: false, // 初期状態は全てお気に入りなし
-  }));
-
-  const [articles, setArticles] = useState<Article[]>(initialArticles);
+  // サンプル記事データ
+  const [articles, setArticles] = useState<Article[]>([
+    {
+      id: "1",
+      title: "React 19の新機能と破壊的変更の完全ガイド",
+      description:
+        "React 19で導入される新しいフック、Server Components、そして注意すべき破壊的変更について詳しく解説します。",
+      url: "https://example.com/article/1",
+      publishedAt: "2024-11-20T10:00:00Z",
+      source: {
+        id: "tech-blog",
+        name: "Tech Blog",
+      },
+      author: "山田太郎",
+      tags: ["React", "JavaScript", "Frontend"],
+      isFavorite: false,
+    },
+    {
+      id: "2",
+      title: "Next.js 15 App Routerのパフォーマンス最適化テクニック",
+      description:
+        "App Routerを使用したNext.jsアプリケーションのパフォーマンスを最大化するための実践的なテクニックを紹介します。",
+      url: "https://example.com/article/2",
+      publishedAt: "2024-11-19T14:30:00Z",
+      source: {
+        id: "dev-community",
+        name: "Dev Community",
+      },
+      author: "佐藤花子",
+      tags: ["Next.js", "Performance", "React"],
+      isFavorite: true,
+    },
+    {
+      id: "3",
+      title: "TypeScript 5.3の新機能：型安全性の向上",
+      description:
+        "TypeScript 5.3で追加された新しい型システムの機能と、より安全なコードを書くためのベストプラクティス。",
+      url: "https://example.com/article/3",
+      publishedAt: "2024-11-18T09:15:00Z",
+      source: {
+        id: "typescript-weekly",
+        name: "TypeScript Weekly",
+      },
+      author: "鈴木一郎",
+      tags: ["TypeScript", "JavaScript", "Type Safety"],
+      isFavorite: false,
+    },
+  ]);
 
   /**
    * お気に入りトグルハンドラ
