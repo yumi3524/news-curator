@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import ArticleCard from "./_components/ArticleCard";
 import FilterPanel from "./_components/FilterPanel";
 import { Article } from "@/app/types/types";
-import { getArticles } from "@/app/data/mockData";
 import {
   filterArticles,
   extractUniqueSources,
@@ -15,15 +14,12 @@ import {
 /**
  * フィードページ
  * フィルタ機能付きの記事一覧を表示
+ * Qiita RSSから記事を取得
  */
 export default function FeedPage() {
-  // モックデータから記事を取得（お気に入り状態を初期化）
-  const initialArticles = getArticles().map((article) => ({
-    ...article,
-    isFavorite: false,
-  }));
-
-  const [articles, setArticles] = useState<Article[]>(initialArticles);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // フィルタ状態
   const [filters, setFilters] = useState<FilterOptions>({
@@ -31,6 +27,45 @@ export default function FeedPage() {
     selectedTags: [],
     searchKeyword: "",
   });
+
+  // 記事を取得
+  useEffect(() => {
+    async function loadArticles() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await fetch("/api/articles?source=qiita&tag=React&limit=20");
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch articles: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        if (!data.articles || !Array.isArray(data.articles)) {
+          throw new Error("Invalid API response format");
+        }
+
+        // ExternalArticleをArticle形式に変換（isFavoriteを追加）
+        const articles: Article[] = data.articles.map(
+          (article: any) => ({
+            ...article,
+            isFavorite: false,
+          })
+        );
+
+        setArticles(articles);
+      } catch (err) {
+        console.error("Error loading articles:", err);
+        setError(err instanceof Error ? err.message : "Failed to load articles");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadArticles();
+  }, []);
 
   // 利用可能なソースとタグ（全記事から抽出）
   const availableSources = useMemo(
@@ -68,17 +103,17 @@ export default function FeedPage() {
             技術記事キュレーション
           </h1>
           <p className="mt-2 text-gray-600">
-            最新の技術記事をフィルタリングして閲覧
+            外部ソース（Qiita）から最新の技術記事を取得
           </p>
         </div>
       </header>
 
       {/* メインコンテンツ */}
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
-          {/* フィルタパネル */}
-          <aside>
-            <div className="sticky top-8">
+        <div className="flex flex-col gap-6 lg:flex-row">
+          {/* フィルタパネル（サイドバー） */}
+          <aside className="w-full lg:w-80">
+            <div className="sticky top-4">
               <FilterPanel
                 availableSources={availableSources}
                 availableTags={availableTags}
@@ -89,36 +124,47 @@ export default function FeedPage() {
           </aside>
 
           {/* 記事リスト */}
-          <div>
-            {/* 結果表示 */}
-            <div className="mb-6">
-              <p className="text-sm text-gray-600">
-                {filteredArticles.length}件の記事が見つかりました
-                {filteredArticles.length !== articles.length &&
-                  ` (全${articles.length}件中)`}
-              </p>
-            </div>
-
-            {/* 記事グリッド */}
-            {filteredArticles.length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2">
-                {filteredArticles.map((article) => (
-                  <ArticleCard
-                    key={article.id}
-                    article={article}
-                    onToggleFavorite={handleToggleFavorite}
-                  />
-                ))}
+          <div className="flex-1">
+            {loading && (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-center">
+                  <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
+                  <p className="text-gray-600">記事を読み込み中...</p>
+                </div>
               </div>
-            ) : (
+            )}
+
+            {error && (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-6">
+                <p className="text-red-800">
+                  <strong>エラー:</strong> {error}
+                </p>
+              </div>
+            )}
+
+            {!loading && !error && filteredArticles.length === 0 && (
               <div className="rounded-lg border border-gray-200 bg-white p-12 text-center">
                 <p className="text-gray-600">
                   条件に一致する記事が見つかりませんでした。
                 </p>
-                <p className="mt-2 text-sm text-gray-500">
-                  フィルタ条件を変更してお試しください。
-                </p>
               </div>
+            )}
+
+            {!loading && !error && filteredArticles.length > 0 && (
+              <>
+                <div className="mb-4 text-sm text-gray-600">
+                  {filteredArticles.length}件の記事が見つかりました
+                </div>
+                <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                  {filteredArticles.map((article) => (
+                    <ArticleCard
+                      key={article.id}
+                      article={article}
+                      onToggleFavorite={handleToggleFavorite}
+                    />
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>
