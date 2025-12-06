@@ -2,6 +2,8 @@
 
 最新の技術記事をカード形式で一覧・閲覧できる、フロントエンド特化のキュレーションアプリケーションです。
 
+**🔗 デモ**: [https://news-curator-zeta.vercel.app/](https://news-curator-zeta.vercel.app/)
+
 ## 目的（Purpose）
 
 - フロントエンド（Next.js / TypeScript / Tailwind CSS）を用いた  
