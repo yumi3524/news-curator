@@ -19,6 +19,8 @@ export interface ExternalArticle {
   author?: string;
   tags: string[];
   imageUrl?: string;
+  likesCount?: number; // いいね数（人気度の指標）
+  stocksCount?: number; // ストック数（Qiita特有）
 }
 
 /**
@@ -40,4 +42,28 @@ export interface FetchOptions {
   tag?: string;
   user?: string;
   limit?: number;
+}
+
+/**
+ * Qiita API Response Types
+ */
+export interface QiitaUser {
+  id: string;
+  profile_image_url: string;
+}
+
+export interface QiitaTag {
+  name: string;
+}
+
+export interface QiitaItem {
+  id: string;
+  title: string;
+  body: string;
+  url: string;
+  created_at: string;
+  user?: QiitaUser;
+  tags: QiitaTag[];
+  likes_count: number;
+  stocks_count: number;
 }

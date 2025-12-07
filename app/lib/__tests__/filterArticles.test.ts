@@ -141,7 +141,7 @@ describe("filterArticles", () => {
     });
 
     context("複数のタグが選択されている場合", () => {
-      it("選択されたすべてのタグを含む記事のみが返されること", () => {
+      it("選択されたいずれかのタグを含む記事が返されること", () => {
         const options: FilterOptions = {
           selectedSources: [],
           selectedTags: ["React", "Performance"],
@@ -150,13 +150,15 @@ describe("filterArticles", () => {
 
         const result = filterArticles(mockArticles, options);
 
-        expect(result).toHaveLength(2);
+        expect(result).toHaveLength(3);
         expect(
           result.every(
-            (a) => a.tags.includes("React") && a.tags.includes("Performance")
+            (a) =>
+              a.tags.includes("React") || a.tags.includes("Performance")
           )
         ).toBe(true);
-        expect(result.map((a) => a.id)).toEqual(["2", "4"]);
+        // ID 1 (React), ID 2 (React, Performance), ID 4 (React, Performance)
+        expect(result.map((a) => a.id)).toEqual(["1", "2", "4"]);
       });
     });
 

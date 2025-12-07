@@ -35,7 +35,7 @@ export default function FeedPage() {
         setLoading(true);
         setError(null);
 
-        const response = await fetch("/api/articles?source=qiita&tag=React&limit=20");
+        const response = await fetch("/api/articles?source=qiita&tag=React&limit=30");
 
         if (!response.ok) {
           throw new Error(`Failed to fetch articles: ${response.statusText}`);
@@ -49,7 +49,7 @@ export default function FeedPage() {
 
         // ExternalArticleをArticle形式に変換（isFavoriteを追加）
         const articles: Article[] = data.articles.map(
-          (article: any) => ({
+          (article: Article[]) => ({
             ...article,
             isFavorite: false,
           })
