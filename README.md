@@ -116,6 +116,18 @@ pnpm type-check
 
 ---
 
+## 開発ワークフロー（Development Workflow）
+
+### CI/CD
+GitHub Actions で以下を自動実行：
+- **ESLint** によるコード品質チェック
+- **TypeScript** の型チェック
+- **Vitest + Playwright** によるテスト
+
+詳細: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
+
+---
+
 ## 開発ガイドライン（Development Guidelines）
 
 ### コーディング規約
