@@ -37,10 +37,10 @@ jobs:
         run: pnpm type-check
 
       - name: Install Playwright Browsers
-        run: pnpm exec @playwright/test install --with-deps
+        run: pnpm exec playwright install --with-deps
 
       - name: Unit Test
-        run: pnpm test run
+        run: pnpm test
 
       - name: E2E Test
         run: pnpm test:e2e
