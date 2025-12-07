@@ -52,5 +52,6 @@ export async function GET(request: Request) {
 }
 
 // Next.js App Routerのキャッシング設定
-// 30秒ごとに再検証（revalidate）
-export const revalidate = 30;
+// 300秒（5分）ごとに再検証（revalidate）
+// Qiita API のレート制限（60回/時）を考慮して設定
+export const revalidate = 300;
