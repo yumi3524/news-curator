@@ -5,7 +5,7 @@
 
 **🔗 デモ**: [https://news-curator-zeta.vercel.app/](https://news-curator-zeta.vercel.app/)
 
-![アプリのスクリーンショット](/images/demo.png)
+![アプリのスクリーンショット](public/images/demo.png)
 
 
 ## 概要
