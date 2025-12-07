@@ -49,7 +49,7 @@ export default function FeedPage() {
 
         // ExternalArticleをArticle形式に変換（isFavoriteを追加）
         const articles: Article[] = data.articles.map(
-          (article: any) => ({
+          (article: Article[]) => ({
             ...article,
             isFavorite: false,
           })

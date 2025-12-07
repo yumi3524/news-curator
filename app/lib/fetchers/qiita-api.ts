@@ -1,4 +1,4 @@
-import { ArticleFetcher, ExternalArticle, FetchOptions } from "./types";
+import { ArticleFetcher, ExternalArticle, FetchOptions, QiitaItem, QiitaTag, QiitaUser } from "./types";
 
 /**
  * Qiita API v2 フェッチャー
@@ -41,14 +41,14 @@ export class QiitaAPIFetcher implements ArticleFetcher {
         throw new Error(`Qiita API エラー: ${response.status} ${response.statusText}`);
       }
 
-      const items = await response.json();
+      const items: QiitaItem[] = await response.json();
 
       if (!Array.isArray(items)) {
         throw new Error("Qiita API のレスポンスが不正です: 配列ではありません");
       }
 
       // APIレスポンスをExternalArticle形式に変換
-      return items.map((item: any) => ({
+      return items.map((item) => ({
         id: item.id,
         title: item.title,
         description: item.body ? this.stripMarkdown(item.body).substring(0, 200) + "..." : "",
@@ -60,7 +60,7 @@ export class QiitaAPIFetcher implements ArticleFetcher {
         },
         author: item.user?.id || "Unknown",
         // Qiita APIはタグオブジェクトの配列を返す [{name: "React", ...}, ...]
-        tags: item.tags.map((t: any) => t.name),
+        tags: item.tags.map((t) => t.name),
         imageUrl: item.user?.profile_image_url,
         likesCount: item.likes_count,
         stocksCount: item.stocks_count,

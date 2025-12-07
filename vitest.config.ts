@@ -15,6 +15,7 @@ const dirname =
 export default defineConfig({
   plugins: [react()],
   test: {
+    exclude: ['**/*.stories.tsx', 'node_modules/**'],
     projects: [
       // Storybook tests
       {
