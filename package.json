@@ -41,7 +41,7 @@
     "eslint-config-next": "16.0.7",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-storybook": "^10.0.8",
-    "jsdom": "^27.2.0",
+    "jsdom": "^25.0.1",
     "playwright": "^1.56.1",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.7.1",
