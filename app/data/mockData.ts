@@ -11,7 +11,7 @@ export const mockArticles: Article[] = [
     description:
       "React 19で導入される新しいフック、Server Components、そして注意すべき破壊的変更について詳しく解説します。",
     url: "https://example.com/react-19-guide",
-    publishedAt: "2024-11-20T10:00:00Z",
+    publishedAt: "2025-11-20T10:00:00Z",
     source: {
       id: "tech-blog",
       name: "Tech Blog",
@@ -26,7 +26,7 @@ export const mockArticles: Article[] = [
     description:
       "App Routerを使用したNext.jsアプリケーションのパフォーマンスを最大化するための実践的なテクニックを紹介します。",
     url: "https://example.com/nextjs-performance",
-    publishedAt: "2024-11-19T14:30:00Z",
+    publishedAt: "2025-11-19T14:30:00Z",
     source: {
       id: "dev-community",
       name: "Dev Community",
@@ -41,7 +41,7 @@ export const mockArticles: Article[] = [
     description:
       "TypeScript 5.3で追加された新しい型システムの機能と、より安全なコードを書くためのベストプラクティス。",
     url: "https://example.com/typescript-5-3",
-    publishedAt: "2024-11-18T09:15:00Z",
+    publishedAt: "2025-11-18T09:15:00Z",
     source: {
       id: "typescript-weekly",
       name: "TypeScript Weekly",
@@ -56,7 +56,7 @@ export const mockArticles: Article[] = [
     description:
       "Tailwind CSS v4で導入される新しいエンジン、パフォーマンス改善、そして開発体験の向上について実際に試した感想をまとめました。",
     url: "https://example.com/tailwind-v4",
-    publishedAt: "2024-11-17T16:45:00Z",
+    publishedAt: "2025-11-17T16:45:00Z",
     source: {
       id: "css-tricks",
       name: "CSS Tricks",
@@ -71,7 +71,7 @@ export const mockArticles: Article[] = [
     description:
       "LCP、FID、CLSを改善するための具体的な手法と、実際のプロジェクトでの適用例を紹介します。",
     url: "https://example.com/core-web-vitals",
-    publishedAt: "2024-11-16T11:20:00Z",
+    publishedAt: "2025-11-16T11:20:00Z",
     source: {
       id: "web-perf",
       name: "Web Performance",
@@ -86,7 +86,7 @@ export const mockArticles: Article[] = [
     description:
       "Server Componentsの基本概念から、実際のアプリケーションでの活用方法まで、実例を交えて解説します。",
     url: "https://example.com/react-server-components",
-    publishedAt: "2024-11-15T13:00:00Z",
+    publishedAt: "2025-11-15T13:00:00Z",
     source: {
       id: "react-news",
       name: "React News",
@@ -97,17 +97,17 @@ export const mockArticles: Article[] = [
   },
   {
     id: "7",
-    title: "モダン JavaScript：ES2024 の新機能まとめ",
+    title: "モダン JavaScript：ES2025 の新機能まとめ",
     description:
-      "ES2024で追加された新しい言語機能と、それらを実際のプロジェクトでどう活用するかを解説します。",
-    url: "https://example.com/es2024-features",
-    publishedAt: "2024-11-14T10:30:00Z",
+      "ES2025で追加された新しい言語機能と、それらを実際のプロジェクトでどう活用するかを解説します。",
+    url: "https://example.com/es2025-features",
+    publishedAt: "2025-11-14T10:30:00Z",
     source: {
       id: "js-weekly",
       name: "JavaScript Weekly",
     },
     author: "渡辺大輔",
-    tags: ["JavaScript", "ES2024", "Language Features"],
+    tags: ["JavaScript", "ES2025", "Language Features"],
     imageUrl: "https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?w=800&h=400&fit=crop",
   },
   {
@@ -116,7 +116,7 @@ export const mockArticles: Article[] = [
     description:
       "WCAG 2.1に準拠したアクセシブルなReactコンポーネントの作り方と、実装時の注意点を詳しく解説します。",
     url: "https://example.com/accessible-react",
-    publishedAt: "2024-11-13T15:45:00Z",
+    publishedAt: "2025-11-13T15:45:00Z",
     source: {
       id: "a11y-matters",
       name: "A11y Matters",
@@ -127,11 +127,11 @@ export const mockArticles: Article[] = [
   },
   {
     id: "9",
-    title: "GraphQL vs REST：2024年の選択基準",
+    title: "GraphQL vs REST：2025年の選択基準",
     description:
       "GraphQLとRESTの特徴を比較し、プロジェクトに応じた最適なAPI設計の選択方法を解説します。",
     url: "https://example.com/graphql-vs-rest",
-    publishedAt: "2024-11-12T09:00:00Z",
+    publishedAt: "2025-11-12T09:00:00Z",
     source: {
       id: "api-design",
       name: "API Design",
@@ -146,7 +146,7 @@ export const mockArticles: Article[] = [
     description:
       "コンテナ技術を活用した効率的な開発環境の構築方法と、チーム開発での運用ノウハウを紹介します。",
     url: "https://example.com/docker-kubernetes-dev",
-    publishedAt: "2024-11-11T14:15:00Z",
+    publishedAt: "2025-11-11T14:15:00Z",
     source: {
       id: "devops-weekly",
       name: "DevOps Weekly",
@@ -161,7 +161,7 @@ export const mockArticles: Article[] = [
     description:
       "Vitestの特徴と、JestからVitestへの移行手順、そしてテストパフォーマンスの改善について解説します。",
     url: "https://example.com/vitest-migration",
-    publishedAt: "2024-11-10T11:30:00Z",
+    publishedAt: "2025-11-10T11:30:00Z",
     source: {
       id: "testing-blog",
       name: "Testing Blog",
@@ -176,7 +176,7 @@ export const mockArticles: Article[] = [
     description:
       "Webアプリケーションにおける代表的な脆弱性であるXSSとCSRFについて、具体的な対策方法を実装例とともに解説します。",
     url: "https://example.com/web-security-basics",
-    publishedAt: "2024-11-09T16:00:00Z",
+    publishedAt: "2025-11-09T16:00:00Z",
     source: {
       id: "security-first",
       name: "Security First",

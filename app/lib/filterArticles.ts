@@ -40,12 +40,10 @@ export function filterArticles(
       }
     }
 
-    // タグフィルタ: 選択されたタグすべてを含む必要がある
+    // タグフィルタ: 選択されたタグのいずれかを含む必要がある（OR条件）
     if (selectedTags.length > 0) {
-      const hasAllTags = selectedTags.every((tag) =>
-        article.tags.includes(tag)
-      );
-      if (!hasAllTags) {
+      const hasAnyTag = selectedTags.some((tag) => article.tags.includes(tag));
+      if (!hasAnyTag) {
         return false;
       }
     }

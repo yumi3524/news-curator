@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { QiitaRSSFetcher } from "@/app/lib/fetchers/qiita";
+import { QiitaAPIFetcher } from "@/app/lib/fetchers/qiita-api";
 
 /**
  * 外部ソースから記事を取得するAPI
  *
- * GET /api/articles?source=qiita&tag=React&limit=20
+ * GET /api/articles?source=qiita&tag=React&limit=50
  *
  * クエリパラメータ:
  * - source: ソース名（現在は "qiita" のみサポート）
@@ -16,14 +16,14 @@ export async function GET(request: Request) {
   const source = searchParams.get("source") || "qiita";
   const tag = searchParams.get("tag") || undefined;
   const limitParam = searchParams.get("limit");
-  const limit = limitParam ? parseInt(limitParam, 10) : 20;
+  const limit = limitParam ? parseInt(limitParam, 10) : 30;
 
   try {
     let articles = [];
 
     switch (source) {
       case "qiita": {
-        const qiitaFetcher = new QiitaRSSFetcher();
+        const qiitaFetcher = new QiitaAPIFetcher();
         articles = await qiitaFetcher.fetch({ tag, limit });
         break;
       }

@@ -35,7 +35,7 @@ export default function FeedPage() {
         setLoading(true);
         setError(null);
 
-        const response = await fetch("/api/articles?source=qiita&tag=React&limit=20");
+        const response = await fetch("/api/articles?source=qiita&tag=React&limit=30");
 
         if (!response.ok) {
           throw new Error(`Failed to fetch articles: ${response.statusText}`);

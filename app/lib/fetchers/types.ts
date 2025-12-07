@@ -19,6 +19,8 @@ export interface ExternalArticle {
   author?: string;
   tags: string[];
   imageUrl?: string;
+  likesCount?: number; // いいね数（人気度の指標）
+  stocksCount?: number; // ストック数（Qiita特有）
 }
 
 /**

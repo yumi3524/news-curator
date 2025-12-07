@@ -1,5 +1,5 @@
 /**
- * Article source information
+ * 記事ソース情報
  */
 export interface ArticleSource {
   id: string;
@@ -7,8 +7,8 @@ export interface ArticleSource {
 }
 
 /**
- * Article data structure
- * Designed to be compatible with future API integration
+ * 記事データ構造
+ * 将来のAPI統合を考慮した設計
  */
 export interface Article {
   id: string;
@@ -20,11 +20,13 @@ export interface Article {
   author?: string;
   tags: string[];
   imageUrl?: string;
+  likesCount?: number; // いいね数
+  stocksCount?: number; // ストック数
   isFavorite?: boolean; // お気に入り状態（フィード機能用）
 }
 
 /**
- * API response structure (for future use)
+ * API レスポンス構造（将来の使用を想定）
  */
 export interface ArticlesResponse {
   articles: Article[];
