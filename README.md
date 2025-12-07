@@ -2,7 +2,6 @@
 
 最新の技術記事をカード形式で一覧・閲覧できる、フロントエンド特化のキュレーションアプリケーションです。
 
-
 **🔗 デモ**: [https://news-curator-zeta.vercel.app/](https://news-curator-zeta.vercel.app/)
 
 ![アプリのスクリーンショット](public/images/demo.png)
@@ -28,30 +27,20 @@ AI・Web技術・スタートアップなど、興味のある分野の最新記
 
 ## 機能（Features）
 
-### 主な機能
-- **Qiita API 連携**: Qiita REST API v2 を利用して最新記事を取得
+### 実装済み機能
+- **Qiita API 連携**: Qiita API v2 を利用して最新記事をサーバーサイドで取得
 - **リッチな情報表示**: 記事の「いいね数」「ストック数」を表示して人気度を可視化
 - **タグフィルタリング**: 興味のある技術タグ（React, Next.js等）で記事を絞り込み
 - **レスポンシブ UI**: PC・スマホ問わず快適に閲覧できるカード型レイアウト
-- **お気に入り機能**: 気になる記事を一時的に保存（ローカルステート）
+- **お気に入り機能**: 気になる記事を一時的に保存（セッション内）
 
-### 今後の拡張予定
+### 今後の開発計画 (Roadmap)
+詳細は [ROADMAP.md](./ROADMAP.md) をご覧ください。
 
-- 記事検索（キーワード検索）
-- タグによるフィルタリング
-- お気に入り（Bookmark）機能
-- 外部API（News API / RSS等）との統合
-- ページネーション / ソート（公開日／人気順など）
+- Zenn / Hacker News など他ソースへの対応
+- URLクエリによるフィルタ状態の共有
 - ダークモード対応
-
-
-
-### 設計上のポイント
-
-- `app/` 配下で **ページ・レイアウト・UIコンポーネント・データ・型定義を明確に分離**
-- `app/types/` に Article 型などを定義し、Card/List コンポーネント間で共有
-- Qiita API からデータを取得し、将来的な他の外部API統合（News API / RSS など）にも対応できるよう、  
-  データ取得ロジックを `app/lib/fetchers/` に分離した拡張しやすい構造
+- お気に入りの永続化
 
 ---
 
@@ -60,26 +49,21 @@ AI・Web技術・スタートアップなど、興味のある分野の最新記
 ```
 news-curator/
 ├── app/
-│   ├── articles/
-│   │   └── [id]/
-│   │       └── page.tsx          # 記事詳細ページ（動的ルーティング）
-│   ├── components/
-│   │   ├── ArticleCard.tsx       # 記事カードコンポーネント
-│   │   ├── ArticleList.tsx       # 記事一覧コンポーネント
-│   │   └── Header.tsx            # ヘッダーコンポーネント
+│   ├── (feed)/           # フィード機能（ルートグループ）
+│   │   ├── _components/  # フィード専用コンポーネント
+│   │   │   ├── ArticleCard.tsx
+│   │   │   ├── FilterPanel.tsx
+│   │   │   └── __tests__/
+│   │   └── page.tsx      # メインページ
+│   ├── api/
+│   │   └── articles/     # 記事取得APIエンドポイント
 │   ├── lib/
-│   │   └── fetchers/
-│   │       ├── qiita-api.ts      # Qiita REST API フェッチャー（v2）
-│   │       └── types.ts          # フェッチャー共通型定義
-│   ├── types/
-│   │   └── types.ts              # TypeScript型定義
-│   ├── globals.css               # グローバルスタイル
-│   ├── layout.tsx                # ルートレイアウト
-│   └── page.tsx                  # トップページ（記事一覧）
-├── public/                       # 静的ファイル
-└── docs/                         # ドキュメント
-    ├── API_INTEGRATION.md        # API統合ガイド
-    └── filter-cases.md           # フィルタリング仕様
+│   │   ├── fetchers/     # データ取得ロジック（Qiita API等）
+│   │   └── filterArticles.ts
+│   ├── types/            # 共通型定義
+│   └── layout.tsx        # ルートレイアウト
+├── public/               # 静的ファイル
+└── docs/                 # ドキュメント
 ```
 
 ---
@@ -158,6 +142,7 @@ test: テスト追加・修正
 
 ## ドキュメント（Documentation）
 
+- [ROADMAP.md](./ROADMAP.md) - 開発ロードマップ
 - [API統合ガイド](./docs/api-integration.md) - 外部API統合の手順
 - [フィルタリング仕様](./docs/filter-cases.md) - タグフィルタリングの実装仕様
 
@@ -166,14 +151,14 @@ test: テスト追加・修正
 ## 工夫した点（Key Highlights）
 
 ### 1. Qiita RSS から API v2 への移行と設計判断
-初期開発フェーズでは認証不要な RSS フィードを採用しましたが、以下の課題に直面し API v2 への移行を決断しました。
-- **課題**: RSS フィードでは「タグ情報」が正確に取得できず、フィルタリング機能の実装が困難だった。また、「いいね数」が取得できず、記事の人気度がわからなかった。
+初期開発フェーズでは認証不要な RSS フィードを検討しましたが、以下の課題のため API v2 へ移行しました。
+- **課題**: RSS フィードでは「タグ情報」が正確に取得できず、フィルタリング機能の実装が困難。また、「いいね数」が取得できない。
 - **解決策**: Qiita API (REST) を採用し、タグ配列や `likes_count` を取得するように変更。
-- **工夫**: API 移行を見越してデータフェッチ層を `fetchers/` ディレクトリに分離し、インターフェース (`ArticleFetcher`) を定義していたため、呼び出し元のコンポーネントを修正することなくスムーズに移行できました。
+- **工夫**: データフェッチ層を `app/lib/fetchers/` に分離し、インターフェース (`ArticleFetcher`) を定義。これにより将来 Zenn などを追加する際も `fetchers/zenn-rss.ts` を追加するだけで対応可能な設計としています。
 
 ### 2. 型安全性と拡張性
-- API レスポンスの型 (`ExternalArticle`) と、UI コンポーネントで扱う型 (`Article`) を明確に区別して定義しました。
-- これにより、将来 Zenn や TechFeed など他のソースを追加した際も、UI 側のコードを変更せずにデータ変換層だけで対応できる設計になっています。
+- API レスポンスの型 (`ExternalArticle`) と、UI コンポーネントで扱う型 (`Article`) を明確に区別して定義。
+- これにより、データソースが増えても UI 側の変更を最小限に抑えることができます。
 
 ### 3. パフォーマンス最適化
 - **Server Components**: 記事データ取得をサーバーサイドで行い、クライアントへのJS転送量を削減。
