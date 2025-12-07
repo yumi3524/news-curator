@@ -10,7 +10,6 @@ const dirname =
 export default defineConfig({
   plugins: [react()],
   test: {
-    exclude: ['**/*.stories.tsx', 'node_modules/**'],
     projects: [
       // Regular component tests
       {
@@ -19,6 +18,7 @@ export default defineConfig({
           environment: 'jsdom',
           globals: true,
           setupFiles: ['./vitest.setup.ts'],
+          exclude: ['**/*.stories.tsx', 'node_modules/**', 'e2e/**', 'dist/**'],
         },
       },
     ],
