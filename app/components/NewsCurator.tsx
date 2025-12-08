@@ -15,18 +15,13 @@ export function NewsCurator() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<string>('—');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSources, setSelectedSources] = useState<Set<string>>(new Set());
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
   const [filterMode, setFilterMode] = useState<'OR' | 'AND'>('OR');
 
-  const updateLastUpdatedTime = () => {
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
-    setLastUpdated(timeStr);
-  };
+
 
   const fetchArticles = useCallback(async () => {
     setIsLoading(true);
@@ -36,7 +31,6 @@ export function NewsCurator() {
       if (!response.ok) throw new Error('記事の取得に失敗しました');
       const data = await response.json();
       setArticles(data.articles || []);
-      updateLastUpdatedTime();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'エラーが発生しました');
     } finally {
@@ -157,9 +151,9 @@ export function NewsCurator() {
 
   return (
     <>
-      <Header lastUpdated={lastUpdated} onRefresh={fetchArticles} isLoading={isLoading} />
+      <Header />
 
-      <main className="mx-auto max-w-[1400px] px-8 py-8">
+      <main className="mx-auto max-w-[1400px] px-4 py-8 md:px-8">
         <FilterSection
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -184,7 +178,7 @@ export function NewsCurator() {
         ) : (
           <>
             {featuredArticle && <FeaturedArticle article={featuredArticle} />}
-            <div className="grid animate-[fadeIn_0.5s_ease-out_0.3s_both] grid-cols-[repeat(auto-fill,minmax(380px,1fr))] gap-6">
+            <div className="grid animate-[fadeIn_0.5s_ease-out_0.3s_both] grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
               {regularArticles.map((article) => (
                 <ArticleCard key={article.id} article={article} />
               ))}

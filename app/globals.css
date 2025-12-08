@@ -1,7 +1,12 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Light Mode Colors (Amber Original) */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Light Mode Colors (Amber Original) */
+:root {
   --color-brand-primary: #F59E0B;
   --color-brand-secondary: #1E293B;
   --color-brand-accent: #FBBF24;
@@ -12,10 +17,11 @@
   --color-text-primary: #0F172A;
   --color-text-secondary: #475569;
   --color-text-tertiary: #94A3B8;
+  --color-text-on-accent: #FFFFFF;
   --color-border: #E2E8F0;
-
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-featured-bg-start: #001F3F;
+  --color-featured-bg-end: #003366;
+  --color-featured-text: #FFFFFF;
 }
 
 /* Dark Mode Colors */
@@ -30,6 +36,7 @@
   --color-text-primary: #F1F5F9;
   --color-text-secondary: #CBD5E1;
   --color-text-tertiary: #94A3B8;
+  --color-text-on-accent: #0F172A;
   --color-border: #334155;
 }
 
@@ -81,6 +88,7 @@ body {
   0% {
     background-position: 200% 0;
   }
+
   100% {
     background-position: -200% 0;
   }

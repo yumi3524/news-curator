@@ -35,7 +35,7 @@ test.describe("フィードページ", () => {
 
   test("テーマ切り替えが機能すること", async ({ page }) => {
     // 初期状態はライトモード（test.useで指定）
-    const themeButton = page.getByRole("button", { name: "ライトモード" });
+    const themeButton = page.getByRole("button", { name: "ライトモードに切り替え" });
     await expect(themeButton).toBeVisible();
     
     // htmlタグにdarkクラスがないことを確認
@@ -45,8 +45,8 @@ test.describe("フィードページ", () => {
     // ダークモードに切り替え
     await themeButton.click();
 
-    // ボタンのテキストが変わることを確認
-    await expect(page.getByRole("button", { name: "ダークモード" })).toBeVisible();
+    // ボタンのAccessible Nameが変わることを確認
+    await expect(page.getByRole("button", { name: "ダークモードに切り替え" })).toBeVisible();
     
     // htmlタグにdarkクラスが付与されることを確認
     await expect(html).toHaveClass(/dark/);
@@ -54,7 +54,7 @@ test.describe("フィードページ", () => {
     // リロードしても設定が維持されること（localStorage）
     await page.reload();
     await expect(html).toHaveClass(/dark/);
-    await expect(page.getByRole("button", { name: "ダークモード" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "ダークモードに切り替え" })).toBeVisible();
   });
 
   test("記事一覧が表示されること", async ({ page }) => {
