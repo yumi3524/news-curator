@@ -26,10 +26,8 @@ export function FeaturedArticle({ article }: FeaturedArticleProps) {
         href={article.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="group relative block cursor-pointer overflow-hidden rounded-xl border-l-4 border-[var(--color-brand-primary)] bg-gradient-to-r from-[var(--color-featured-bg-start)] to-[var(--color-featured-bg-end)] p-4 shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] md:p-4 lg:p-6 xl:p-8"
+        className="group relative block cursor-pointer overflow-hidden rounded-xl border-l-4 border-[var(--color-brand-primary)] bg-[var(--color-featured-bg-start)] p-4 shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] md:p-4 lg:p-6 xl:p-8"
       >
-        {/* Glow effect */}
-        <div className="pointer-events-none absolute right-0 top-0 h-[300px] w-[300px] opacity-15 bg-[radial-gradient(circle,var(--color-brand-primary)_0%,transparent_70%)]" />
 
         <div className="relative z-10">
           {/* Tags */}
