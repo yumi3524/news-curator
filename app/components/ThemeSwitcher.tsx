@@ -41,16 +41,14 @@ export function ThemeSwitcher() {
   return (
     <button
       onClick={toggleTheme}
-      className="fixed top-5 right-5 z-[1000] flex items-center gap-2 rounded-xl border-[1.5px] border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-5 py-3 shadow-[0_2px_8px_rgba(0,0,0,0.1)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--color-brand-primary)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
+      aria-label={isDark ? 'ライトモードに切り替え' : 'ダークモードに切り替え'}
+      className="flex items-center justify-center rounded-xl border-[1.5px] border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.1)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--color-brand-primary)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)] md:p-3"
     >
       {isDark ? (
-        <Moon className="h-[18px] w-[18px] text-[var(--color-brand-primary)]" />
+        <Moon className="h-4 w-4 text-[var(--color-brand-primary)] md:h-5 md:w-5" />
       ) : (
-        <Sun className="h-[18px] w-[18px] text-[var(--color-brand-primary)]" />
+        <Sun className="h-4 w-4 text-[var(--color-brand-primary)] md:h-5 md:w-5" />
       )}
-      <span className="text-sm font-semibold text-[var(--color-text-primary)]">
-        {isDark ? 'ダークモード' : 'ライトモード'}
-      </span>
     </button>
   );
 }

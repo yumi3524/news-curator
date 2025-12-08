@@ -80,11 +80,19 @@ export class QiitaAPIFetcher implements ArticleFetcher {
    * Qiita APIから記事を取得
    */
   private async fetchFromApi(url: string): Promise<QiitaItem[]> {
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+    };
+
+    // 環境変数からアクセストークンを取得
+    const accessToken = process.env.QIITA_ACCESS_TOKEN;
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
     const response = await fetch(url, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       next: {
         revalidate: this.cacheSeconds,
       },

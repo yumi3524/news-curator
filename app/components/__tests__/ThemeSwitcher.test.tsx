@@ -39,7 +39,7 @@ describe('ThemeSwitcher', () => {
 
     // ダークモードになるべき
     expect(document.documentElement.classList.contains('dark')).toBe(true);
-    expect(screen.getByText('ダークモード')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'ライトモードに切り替え' })).toBeInTheDocument();
   });
 
   it('localStorageの設定がない場合、システム設定(ライト)に従うこと', () => {
@@ -58,7 +58,7 @@ describe('ThemeSwitcher', () => {
 
     // ライトモードになるべき
     expect(document.documentElement.classList.contains('dark')).toBe(false);
-    expect(screen.getByText('ライトモード')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'ダークモードに切り替え' })).toBeInTheDocument();
   });
 
   it('システム設定よりもlocalStorageの設定を優先すること', () => {
@@ -80,7 +80,7 @@ describe('ThemeSwitcher', () => {
 
     // ライトモードになるべき
     expect(document.documentElement.classList.contains('dark')).toBe(false);
-    expect(screen.getByText('ライトモード')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'ダークモードに切り替え' })).toBeInTheDocument();
   });
 
   it('テーマ切り替えが機能し、localStorageに保存されること', () => {
@@ -90,17 +90,17 @@ describe('ThemeSwitcher', () => {
     render(<ThemeSwitcher />);
 
     const button = screen.getByRole('button');
-    expect(screen.getByText('ライトモード')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'ダークモードに切り替え' })).toBeInTheDocument();
 
     // ダークモードに切り替え
     fireEvent.click(button);
-    expect(screen.getByText('ダークモード')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'ライトモードに切り替え' })).toBeInTheDocument();
     expect(document.documentElement.classList.contains('dark')).toBe(true);
     expect(localStorage.getItem('darkMode')).toBe('true');
 
     // ライトモードに戻す
     fireEvent.click(button);
-    expect(screen.getByText('ライトモード')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'ダークモードに切り替え' })).toBeInTheDocument();
     expect(document.documentElement.classList.contains('dark')).toBe(false);
     expect(localStorage.getItem('darkMode')).toBe('false');
   });
