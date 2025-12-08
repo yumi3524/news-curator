@@ -19,8 +19,8 @@
   --color-text-tertiary: #94A3B8;
   --color-text-on-accent: #FFFFFF;
   --color-border: #E2E8F0;
-  --color-featured-bg-start: #001F3F;
-  --color-featured-bg-end: #003366;
+  --color-featured-bg-start: #1E293B;
+  --color-featured-bg-end: #334155;
   --color-featured-text: #FFFFFF;
 }
 
@@ -38,6 +38,9 @@
   --color-text-tertiary: #94A3B8;
   --color-text-on-accent: #0F172A;
   --color-border: #334155;
+  --color-featured-bg-start: #334155;
+  --color-featured-bg-end: #475569;
+  --color-featured-text: #FFFFFF;
 }
 
 body {
