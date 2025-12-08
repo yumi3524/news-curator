@@ -34,3 +34,11 @@ export interface ArticlesResponse {
   page?: number;
   pageSize?: number;
 }
+
+/**
+ * タグまたはソースのカウント情報
+ */
+export interface TagCount {
+  name: string;
+  count: number;
+}
