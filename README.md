@@ -31,16 +31,16 @@ AI・Web技術・スタートアップなど、興味のある分野の最新記
 - **Qiita API 連携**: Qiita API v2 を利用して最新記事をサーバーサイドで取得
 - **リッチな情報表示**: 記事の「いいね数」「ストック数」を表示して人気度を可視化
 - **タグフィルタリング**: 興味のある技術タグ（React, Next.js等）で記事を絞り込み
+- **注目記事（PICK UP!）**: 特に注目すべき記事をハイライト表示
+- **ダークモード**: ワンクリックでライト/ダークテーマを切り替え
 - **レスポンシブ UI**: PC・スマホ問わず快適に閲覧できるカード型レイアウト
 - **お気に入り機能**: 気になる記事を一時的に保存（セッション内）
+- **包括的なテスト**: Vitest、React Testing Library、Playwrightによるユニット・E2Eテスト
+- **Storybook**: コンポーネントの開発・ドキュメント環境
+- **充実したUIフィードバック**: ローディング、エラー、空状態の適切な表示
 
 ### 今後の開発計画 (Roadmap)
 詳細は [ROADMAP.md](./ROADMAP.md) をご覧ください。
-
-- Zenn / Hacker News など他ソースへの対応
-- URLクエリによるフィルタ状態の共有
-- ダークモード対応
-- お気に入りの永続化
 
 ---
 
@@ -50,18 +50,27 @@ AI・Web技術・スタートアップなど、興味のある分野の最新記
 news-curator/
 ├── app/
 │   ├── (feed)/           # フィード機能（ルートグループ）
-│   │   ├── _components/  # フィード専用コンポーネント
-│   │   │   ├── ArticleCard.tsx
-│   │   │   ├── FilterPanel.tsx
-│   │   │   └── __tests__/
 │   │   └── page.tsx      # メインページ
-│   ├── api/
-│   │   └── articles/     # 記事取得APIエンドポイント
+│   ├── components/       # 共通UIコンポーネント
+│   │   ├── ArticleCard.tsx
+│   │   ├── FeaturedArticle.tsx
+│   │   ├── FilterSection.tsx
+│   │   ├── Header.tsx
+│   │   ├── NewsCurator.tsx
+│   │   ├── ThemeSwitcher.tsx
+│   │   ├── LoadingState.tsx
+│   │   ├── ErrorState.tsx
+│   │   ├── EmptyState.tsx
+│   │   └── __tests__/    # コンポーネントテスト
 │   ├── lib/
 │   │   ├── fetchers/     # データ取得ロジック（Qiita API等）
-│   │   └── filterArticles.ts
+│   │   ├── filterArticles.ts
+│   │   └── utils.ts
 │   ├── types/            # 共通型定義
+│   ├── globals.css       # グローバルスタイル・テーマ
 │   └── layout.tsx        # ルートレイアウト
+├── e2e/                  # E2Eテスト（Playwright）
+├── .storybook/           # Storybookの設定
 ├── public/               # 静的ファイル
 └── docs/                 # ドキュメント
 ```
@@ -112,6 +121,35 @@ pnpm lint
 
 # 型チェック
 pnpm type-check
+```
+
+### テスト
+
+```bash
+# ユニットテストの実行
+pnpm test
+
+# テストをUIモードで実行
+pnpm test:ui
+
+# テストカバレッジの確認
+pnpm test:coverage
+
+# E2Eテストの実行
+pnpm test:e2e
+
+# E2EテストをUIモードで実行
+pnpm test:e2e:ui
+```
+
+### Storybook
+
+```bash
+# コンポーネントカタログの起動
+pnpm storybook
+
+# Storybookのビルド
+pnpm build-storybook
 ```
 
 ---
