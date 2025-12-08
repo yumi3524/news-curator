@@ -42,6 +42,8 @@ export interface FetchOptions {
   tag?: string;
   user?: string;
   limit?: number;
+  days?: number; // 過去N日間の記事を取得
+  sortBy?: 'created' | 'likes' | 'stocks'; // ソート順
 }
 
 /**
