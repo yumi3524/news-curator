@@ -1,4 +1,4 @@
-import { ArticleFetcher, ExternalArticle, FetchOptions, QiitaItem, QiitaTag, QiitaUser } from "./types";
+import { ArticleFetcher, ExternalArticle, FetchOptions, QiitaItem } from "./types";
 
 /**
  * Qiita API v2 フェッチャー

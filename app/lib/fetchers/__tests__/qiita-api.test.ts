@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { QiitaAPIFetcher } from '../qiita-api';
+import { QiitaItem } from '../types';
 
 describe('QiitaAPIFetcher', () => {
   let fetcher: QiitaAPIFetcher;
@@ -10,7 +11,7 @@ describe('QiitaAPIFetcher', () => {
     vi.clearAllMocks();
   });
 
-  const mockQiitaResponse = [
+  const mockQiitaResponse: QiitaItem[] = [
     {
       id: '1',
       title: 'Test Article',
@@ -28,7 +29,7 @@ describe('QiitaAPIFetcher', () => {
   ];
 
   it('記事を正常に取得できること', async () => {
-    (global.fetch as any).mockResolvedValueOnce({
+    (global.fetch as Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => mockQiitaResponse,
     });
@@ -59,7 +60,7 @@ describe('QiitaAPIFetcher', () => {
     // テスト中の意図的なエラーログ出力を抑制
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    (global.fetch as any).mockResolvedValueOnce({
+    (global.fetch as Mock).mockResolvedValueOnce({
       ok: false,
       status: 500,
       statusText: 'Internal Server Error',
@@ -74,14 +75,14 @@ describe('QiitaAPIFetcher', () => {
   });
 
   it('オプション指定時のURLが正しく構築されること', async () => {
-    (global.fetch as any).mockResolvedValueOnce({
+    (global.fetch as Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => [],
     });
 
     await fetcher.fetch({ tag: 'Next.js', limit: 10, days: 3 });
 
-    const callArgs = (global.fetch as any).mock.calls[0];
+    const callArgs = (global.fetch as Mock).mock.calls[0];
     const url = callArgs[0];
     
     expect(url).toContain('per_page=10');
@@ -96,7 +97,7 @@ describe('QiitaAPIFetcher', () => {
       { ...mockQiitaResponse[0], id: '3', likes_count: 10 },
     ];
 
-    (global.fetch as any).mockResolvedValueOnce({
+    (global.fetch as Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => unsortedResponse,
     });

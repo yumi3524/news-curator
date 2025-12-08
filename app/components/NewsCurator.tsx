@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import type { Article, TagCount } from '@/app/types/types';
 import { Header } from './Header';
 import { FilterSection } from './FilterSection';
@@ -22,7 +22,13 @@ export function NewsCurator() {
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
   const [filterMode, setFilterMode] = useState<'OR' | 'AND'>('OR');
 
-  const fetchArticles = async () => {
+  const updateLastUpdatedTime = () => {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+    setLastUpdated(timeStr);
+  };
+
+  const fetchArticles = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -36,17 +42,11 @@ export function NewsCurator() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchArticles();
-  }, []);
-
-  const updateLastUpdatedTime = () => {
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
-    setLastUpdated(timeStr);
-  };
+  }, [fetchArticles]);
 
   const sources = useMemo<TagCount[]>(() => {
     const sourceMap = new Map<string, number>();
@@ -107,7 +107,11 @@ export function NewsCurator() {
   const handleSourceToggle = (source: string) => {
     setSelectedSources((prev) => {
       const next = new Set(prev);
-      next.has(source) ? next.delete(source) : next.add(source);
+      if (next.has(source)) {
+        next.delete(source);
+      } else {
+        next.add(source);
+      }
       return next;
     });
   };
@@ -115,7 +119,11 @@ export function NewsCurator() {
   const handleTagToggle = (tag: string) => {
     setSelectedTags((prev) => {
       const next = new Set(prev);
-      next.has(tag) ? next.delete(tag) : next.add(tag);
+      if (next.has(tag)) {
+        next.delete(tag);
+      } else {
+        next.add(tag);
+      }
       return next;
     });
   };
