@@ -14,7 +14,7 @@ import { FetchOptions } from "@/app/lib/fetchers/types";
  * - days: 過去N日間の記事を取得（オプション、デフォルト: 7日）
  * - sortBy: ソート順 created|likes|stocks（オプション、デフォルト: likes）
  */
-import { DEFAULT_DAYS_AGO, DEFAULT_FETCH_LIMIT, CACHE_REVALIDATE_SECONDS } from "@/app/lib/constants";
+import { DEFAULT_DAYS_AGO, DEFAULT_FETCH_LIMIT } from "@/app/lib/constants";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -62,4 +62,6 @@ export async function GET(request: Request) {
 // Next.js App Routerのキャッシング設定
 // 300秒（5分）ごとに再検証（revalidate）
 // Qiita API のレート制限（60回/時）を考慮して設定
-export const revalidate = CACHE_REVALIDATE_SECONDS;
+// Note: 定数ファイル (CACHE_REVALIDATE_SECONDS) と同じ値を使用していますが、
+// ビルドエラー回避のためリテラル値を直接設定しています。
+export const revalidate = 300;
