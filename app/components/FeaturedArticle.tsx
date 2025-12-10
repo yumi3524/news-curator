@@ -34,19 +34,24 @@ export function FeaturedArticle({ article, onTagClick }: FeaturedArticleProps) {
       >
 
         <div className="relative z-10">
-          {/* Tags */}
-          <div className="mb-2 flex flex-wrap gap-2">
-            {article.tags.map((tag) => (
+          {/* Tags - モバイル: 横スクロール, デスクトップ: 折り返し */}
+          <div className="mb-2 flex gap-2 overflow-x-auto flex-nowrap md:flex-wrap md:overflow-x-visible scrollbar-hide">
+            {article.tags.slice(0, 5).map((tag) => (
               <button
                 key={tag}
                 onClick={(e) => handleTagClick(e, tag)}
-                className="rounded-md bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-[var(--color-featured-text)] backdrop-blur-[10px] transition-all hover:bg-white/20 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-1"
+                className="whitespace-nowrap rounded-md bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-[var(--color-featured-text)] backdrop-blur-[10px] transition-all hover:bg-white/20 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-1"
                 aria-label={`${tag}でフィルタリング`}
                 type="button"
               >
                 {tag}
               </button>
             ))}
+            {article.tags.length > 5 && (
+              <span className="whitespace-nowrap rounded-md bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-[var(--color-featured-text)] backdrop-blur-[10px]">
+                +{article.tags.length - 5}
+              </span>
+            )}
           </div>
 
           {/* Title */}

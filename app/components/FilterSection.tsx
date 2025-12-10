@@ -72,7 +72,7 @@ export function FilterSection({
 
         {/* Tags */}
         <div className="mb-4 flex gap-4">
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[var(--color-text-secondary)]">
               <span>タグで絞り込み</span>
               <div className="ml-auto inline-flex rounded-md bg-[var(--color-bg-tertiary)] p-0.5">
@@ -96,7 +96,8 @@ export function FilterSection({
                 </button>
               </div>
             </div>
-            <div className="flex flex-wrap gap-2">
+            {/* タグコンテナ - 折り返し可能、最大高さ制限付き */}
+            <div className="flex flex-wrap gap-2 max-h-[250px] overflow-y-auto scrollbar-hide">
               {displayedTags.map((tag) => (
                 <button
                   key={tag.name}

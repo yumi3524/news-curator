@@ -14,3 +14,4 @@ export const MIN_STOCKS_COUNT = 5;
 // UI表示関連
 export const MAX_DESCRIPTION_LENGTH = 200;
 export const MAX_TAGS_TO_DISPLAY = 3;
+export const MAX_TAGS_TO_DISPLAY_MOBILE = 5;

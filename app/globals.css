@@ -121,3 +121,17 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+
+/* スクロールバーを非表示にする（機能は維持） */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  /* Safari and Chrome */
+}
