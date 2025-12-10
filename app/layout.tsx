@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "News Curator - 技術記事キュレーション",
-  description: "最新の技術記事を厳選してお届けするキュレーションプラットフォーム",
+  title: "Tech Feed - 技術フィード",
+  description: "最新の技術記事を日々お届けする技術情報フィード",
 };
 
 export default function RootLayout({

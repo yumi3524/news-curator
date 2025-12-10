@@ -8,7 +8,7 @@ export function Header() {
       <div className="mx-auto flex max-w-[1400px] items-start justify-between gap-4 md:items-center">
         <div className="flex-1">
           <h1 className="font-[Sora,sans-serif] text-2xl font-bold leading-tight tracking-tight text-[var(--color-text-primary)] transition-colors duration-300 md:text-[1.75rem]">
-            News <span className="text-[var(--color-brand-primary)] transition-colors duration-300">Curator</span>
+            Tech <span className="text-[var(--color-brand-primary)] transition-colors duration-300">Feed</span>
           </h1>
           <div className="mt-1 flex items-center gap-2">
             {/* Simple badge - mobile only */}
@@ -16,8 +16,8 @@ export function Header() {
               毎朝3分!
             </span>
             <p className="text-sm font-medium text-[var(--color-text-secondary)]">
-              <span className="md:hidden">技術ニュースダッシュボード</span>
-              <span className="hidden md:inline">毎朝3分でキャッチアップできる技術ニュースダッシュボード</span>
+              <span className="md:hidden">日々の技術情報フィード</span>
+              <span className="hidden md:inline">毎朝3分でキャッチアップできる技術情報フィード</span>
             </p>
           </div>
         </div>

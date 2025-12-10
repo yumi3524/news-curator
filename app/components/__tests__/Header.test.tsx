@@ -23,15 +23,15 @@ describe('Header', () => {
   it('タイトルが正しく表示されること', () => {
     render(<Header />);
 
-    expect(screen.getByText('News')).toBeInTheDocument();
-    expect(screen.getByText('Curator')).toBeInTheDocument();
+    expect(screen.getByText('Tech')).toBeInTheDocument();
+    expect(screen.getByText('Feed')).toBeInTheDocument();
   });
 
   it('モバイルで短縮されたサブタイトルが表示されること', () => {
     render(<Header />);
 
     // モバイル用の短縮テキスト
-    const mobileSubtitle = screen.getByText('技術ニュースダッシュボード');
+    const mobileSubtitle = screen.getByText('日々の技術情報フィード');
     expect(mobileSubtitle).toBeInTheDocument();
     expect(mobileSubtitle).toHaveClass('md:hidden');
   });
@@ -40,7 +40,7 @@ describe('Header', () => {
     render(<Header />);
 
     // デスクトップ用の完全なテキスト
-    const desktopSubtitle = screen.getByText('毎朝3分でキャッチアップできる技術ニュースダッシュボード');
+    const desktopSubtitle = screen.getByText('毎朝3分でキャッチアップできる技術情報フィード');
     expect(desktopSubtitle).toBeInTheDocument();
     expect(desktopSubtitle).toHaveClass('hidden', 'md:inline');
   });

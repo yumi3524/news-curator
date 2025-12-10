@@ -1,6 +1,7 @@
 "use client";
 
 import { Article } from "@/app/types/types";
+import { useTagClickHandler } from "../../lib/hooks/useTagClickHandler";
 
 /**
  * ArticleCardコンポーネントのProps
@@ -8,26 +9,16 @@ import { Article } from "@/app/types/types";
 interface ArticleCardProps {
   article: Article;
   onToggleFavorite: (articleId: string) => void;
+  onTagClick?: (tag: string) => void;
 }
 
 /**
  * フィード用の記事カードコンポーネント
- * 
- * UIの意図:
- * - シンプルで読みやすいカードデザイン
- * - ホバー時に軽く浮き上がるエフェクトで、クリック可能であることを示す
- * - お気に入りボタンは右上に配置し、すぐにアクセスできるようにする
- * - タグはバッジ形式で視覚的に区別しやすくする
- * 
- * レスポンシブ対応の考え方:
- * - モバイル: 縦長のカードで情報を縦に配置（タイトル→メタ情報→タグ）
- * - タブレット以上: 余白を増やし、より快適な閲覧体験を提供
- * - タグは折り返しを許可し、多数のタグでもレイアウトが崩れないようにする
- * - テキストは適切な行数制限（line-clamp）で長文でも見やすく
  */
 export default function ArticleCard({
   article,
   onToggleFavorite,
+  onTagClick,
 }: ArticleCardProps) {
   /**
    * 日付を日本語形式でフォーマット
@@ -50,6 +41,8 @@ export default function ArticleCard({
     e.stopPropagation();
     onToggleFavorite(article.id);
   };
+
+  const handleTagClick = useTagClickHandler(onTagClick);
 
   return (
     <article
@@ -172,20 +165,28 @@ export default function ArticleCard({
           )}
         </div>
 
-        {/* タグバッジリスト - 折り返し可能 */}
+        {/* タグバッジリスト - 最大5個表示 */}
         {article.tags.length > 0 && (
           <div
-            className="mt-auto flex flex-wrap gap-2"
+            className="mt-auto flex gap-2 overflow-x-auto flex-nowrap md:flex-wrap md:overflow-x-visible scrollbar-hide"
             data-testid="article-tags"
           >
-            {article.tags.map((tag) => (
-              <span
+            {article.tags.slice(0, 5).map((tag) => (
+              <button
                 key={tag}
-                className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100"
+                onClick={(e) => handleTagClick(e, tag)}
+                className="whitespace-nowrap rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                aria-label={`${tag}でフィルタリング`}
+                type="button"
               >
                 {tag}
-              </span>
+              </button>
             ))}
+            {article.tags.length > 5 && (
+              <span className="whitespace-nowrap rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
+                +{article.tags.length - 5}
+              </span>
+            )}
           </div>
         )}
 
