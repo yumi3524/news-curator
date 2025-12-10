@@ -22,6 +22,7 @@ const mockProps = {
   onFilterModeChange: vi.fn(),
   activeFilters: [],
   onRemoveFilter: vi.fn(),
+  onPersonalSearchClick: vi.fn(),
 };
 
 describe('FilterSection', () => {
@@ -36,7 +37,7 @@ describe('FilterSection', () => {
     render(<FilterSection {...mockProps} />);
 
     const searchInput = screen.getByPlaceholderText('キーワードで検索...');
-    expect(searchInput).toHaveClass('text-base'); // text-base = 16px
+    expect(searchInput).toHaveClass('text-base'); // text-base = 16px (iOS zoom防止)
   });
 
   it('検索入力時にonSearchChangeが呼ばれること', () => {

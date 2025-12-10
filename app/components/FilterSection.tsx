@@ -1,7 +1,9 @@
 'use client';
 
-import { Search, ChevronDown, ChevronUp, Filter } from 'lucide-react';
+import { Search, ChevronDown, ChevronUp, Filter, UserCircle } from 'lucide-react';
 import { useState } from 'react';
+import { Tag } from './Tag';
+import { Input } from './Input';
 
 interface TagCount {
   name: string;
@@ -21,6 +23,7 @@ interface FilterSectionProps {
   onFilterModeChange: (mode: 'OR' | 'AND') => void;
   activeFilters: Array<{ type: 'search' | 'source' | 'tag'; value: string }>;
   onRemoveFilter: (type: string, value: string) => void;
+  onPersonalSearchClick: () => void; // パーソナルサーチボタンハンドラ
 }
 
 export function FilterSection({
@@ -36,6 +39,7 @@ export function FilterSection({
   onFilterModeChange,
   activeFilters,
   onRemoveFilter,
+  onPersonalSearchClick,
 }: FilterSectionProps) {
   const [isTagsExpanded, setIsTagsExpanded] = useState(false);
   const [isSourcesExpanded, setIsSourcesExpanded] = useState(false);
@@ -44,18 +48,16 @@ export function FilterSection({
 
   return (
     <section className="mb-8 animate-[fadeIn_0.5s_ease-out_0.1s_both] rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.05)] md:p-6">
-      {/* Search */}
-      <div className="mb-4 flex gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-[var(--color-text-tertiary)]" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="キーワードで検索..."
-            className="w-full rounded-lg border-[1.5px] border-[var(--color-border)] bg-[var(--color-bg-primary)] px-4 py-3 pl-11 text-base text-[var(--color-text-primary)] transition-all duration-200 placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-brand-primary)] focus:bg-[var(--color-bg-secondary)] focus:shadow-[0_0_0_3px_rgba(245,158,11,0.1)] focus:outline-none"
-          />
-        </div>
+      {/* 検索バー */}
+      <div className="mb-6">
+        <Input
+          type="text"
+          placeholder="キーワードで検索..."
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          leftIcon={<Search className="h-4 w-4" />}
+          fullWidth
+        />
       </div>
 
       {/* Mobile Filter Toggle */}
@@ -99,22 +101,15 @@ export function FilterSection({
             {/* タグコンテナ - 折り返し可能、最大高さ制限付き */}
             <div className="flex flex-wrap gap-2 max-h-[250px] overflow-y-auto scrollbar-hide">
               {displayedTags.map((tag) => (
-                <button
+                <Tag
                   key={tag.name}
+                  label={tag.name}
+                  variant={selectedTags.has(tag.name) ? 'selected' : 'outline'}
+                  size="md"
+                  count={tag.count}
                   onClick={() => onTagToggle(tag.name)}
-                  className={`flex items-center gap-2 rounded-md border-[1.5px] px-4 py-2 text-sm font-medium transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] ${selectedTags.has(tag.name)
-                    ? 'border-[var(--color-brand-primary)] bg-[var(--color-brand-primary)] font-semibold text-[var(--color-text-on-accent)] shadow-[0_2px_8px_rgba(245,158,11,0.3)]'
-                    : 'border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] hover:border-[var(--color-brand-primary)]'
-                    }`}
-                >
-                  <span>{tag.name}</span>
-                  <span className={`rounded-[10px] px-2 py-0.5 text-xs font-semibold ${selectedTags.has(tag.name)
-                    ? 'bg-white/25'
-                    : 'bg-black/[0.08] dark:bg-white/[0.10]'
-                    }`}>
-                    {tag.count}
-                  </span>
-                </button>
+                  className="px-4 py-2 hover:-translate-y-0.5 hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
+                />
               ))}
             </div>
             {tags.length > 10 && (
@@ -158,22 +153,15 @@ export function FilterSection({
             {isSourcesExpanded && (
               <div className="flex flex-wrap gap-2 animate-[slideIn_0.2s_ease-out]">
                 {sources.map((source) => (
-                  <button
+                  <Tag
                     key={source.name}
+                    label={source.name}
+                    variant={selectedSources.has(source.name) ? 'selected' : 'outline'}
+                    size="md"
+                    count={source.count}
                     onClick={() => onSourceToggle(source.name)}
-                    className={`flex items-center gap-2 rounded-md border-[1.5px] px-4 py-2 text-sm font-medium transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] ${selectedSources.has(source.name)
-                      ? 'border-[var(--color-brand-primary)] bg-[var(--color-brand-primary)] font-semibold text-[var(--color-text-on-accent)] shadow-[0_2px_8px_rgba(245,158,11,0.3)]'
-                      : 'border-[var(--color-border)] bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] hover:border-[var(--color-brand-primary)]'
-                      }`}
-                  >
-                    <span>{source.name}</span>
-                    <span className={`rounded-[10px] px-2 py-0.5 text-xs font-semibold ${selectedSources.has(source.name)
-                      ? 'bg-white/25'
-                      : 'bg-black/[0.08] dark:bg-white/[0.10]'
-                      }`}>
-                      {source.count}
-                    </span>
-                  </button>
+                    className="px-4 py-2 hover:-translate-y-0.5 hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
+                  />
                 ))}
               </div>
             )}
@@ -200,6 +188,27 @@ export function FilterSection({
           ))}
         </div>
       )}
+
+      {/* パーソナルサーチボタン */}
+      <div className="mt-4">
+        <button
+          onClick={onPersonalSearchClick}
+          className="group flex w-full items-center gap-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-4 text-left transition-all duration-200 hover:border-[var(--color-brand-primary)] hover:bg-[var(--color-bg-tertiary)] hover:shadow-sm"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-brand-primary)]/10">
+            <UserCircle className="h-5 w-5 text-[var(--color-brand-primary)]" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
+              パーソナルサーチ
+            </h3>
+            <p className="mt-0.5 text-xs text-[var(--color-text-secondary)]">
+              1～5個のタグで詳細検索
+            </p>
+          </div>
+          <ChevronDown className="h-5 w-5 text-[var(--color-text-tertiary)] transition-transform group-hover:translate-x-0.5" />
+        </button>
+      </div>
     </section>
   );
 }

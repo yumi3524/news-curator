@@ -1,8 +1,9 @@
 import { Heart, Bookmark } from 'lucide-react';
 import type { Article } from '@/app/types/types';
-
 import { MAX_TAGS_TO_DISPLAY_MOBILE } from '@/app/lib/constants';
 import { useTagClickHandler } from '../lib/hooks/useTagClickHandler';
+import { Tag } from './Tag';
+import { Badge } from './Badge';
 
 interface ArticleCardProps {
   article: Article;
@@ -27,20 +28,22 @@ export function ArticleCard({ article, onTagClick }: ArticleCardProps) {
       {/* Tags - モバイル: 横スクロール, デスクトップ: 折り返し */}
       <div className="mb-3.5 flex min-h-[28px] gap-1.5 overflow-x-auto flex-nowrap md:flex-wrap md:overflow-x-visible scrollbar-hide">
         {visibleTags.map((tag) => (
-          <button
+          <Tag
             key={tag}
+            label={tag}
+            variant="default"
+            size="sm"
             onClick={(e) => handleTagClick(e, tag)}
-            className="whitespace-nowrap rounded bg-[var(--color-bg-tertiary)] px-2.5 py-1 text-xs font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-brand-primary)] hover:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-primary)] focus:ring-offset-1"
             aria-label={`${tag}でフィルタリング`}
-            type="button"
-          >
-            {tag}
-          </button>
+          />
         ))}
         {remainingCount > 0 && (
-          <span className="whitespace-nowrap rounded bg-[var(--color-bg-tertiary)] px-2.5 py-1 text-xs font-semibold text-[var(--color-text-secondary)]">
-            +{remainingCount}
-          </span>
+          <Tag
+            label={`+${remainingCount}`}
+            variant="default"
+            size="sm"
+            isClickable={false}
+          />
         )}
       </div>
 
@@ -56,18 +59,12 @@ export function ArticleCard({ article, onTagClick }: ArticleCardProps) {
 
       {/* Footer */}
       <div className="mt-auto flex items-center justify-between border-t border-[var(--color-border)] pt-4">
-        <div className="flex gap-4 text-[13px] text-[var(--color-text-tertiary)]">
+        <div className="flex gap-4">
           {article.likesCount !== undefined && (
-            <div className="flex items-center gap-1.5">
-              <Heart className="h-3.5 w-3.5" />
-              <span>{article.likesCount}</span>
-            </div>
+            <Badge icon={<Heart className="h-3.5 w-3.5" />} label={article.likesCount} />
           )}
           {article.stocksCount !== undefined && (
-            <div className="flex items-center gap-1.5">
-              <Bookmark className="h-3.5 w-3.5" />
-              <span>{article.stocksCount}</span>
-            </div>
+            <Badge icon={<Bookmark className="h-3.5 w-3.5" />} label={article.stocksCount} />
           )}
         </div>
 

@@ -9,6 +9,7 @@ import { ArticleCard } from './ArticleCard';
 import { LoadingState } from './LoadingState';
 import { EmptyState } from './EmptyState';
 import { ErrorState } from './ErrorState';
+import { PersonalSearchModal } from './PersonalSearchModal';
 import { getFeaturedArticle, sortByScore } from '@/app/lib/scoring';
 
 export function TechFeed() {
@@ -21,7 +22,24 @@ export function TechFeed() {
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
   const [filterMode, setFilterMode] = useState<'OR' | 'AND'>('OR');
 
+  // パーソナルサーチの状態
+  const [isPersonalSearchOpen, setIsPersonalSearchOpen] = useState(false);
+  const [isPersonalSearchMode, setIsPersonalSearchMode] = useState(false); // パーソナルサーチで記事取得中か
+  const [personalSearchTags, setPersonalSearchTags] = useState<string[]>([]);
 
+
+  // LocalStorageからパーソナルサーチの設定を復元
+  useEffect(() => {
+    const saved = localStorage.getItem('personal-search-tags');
+    if (saved) {
+      try {
+        const tags = JSON.parse(saved);
+        setPersonalSearchTags(tags);
+      } catch (e) {
+        console.error('パーソナルサーチの設定読み込みエラー:', e);
+      }
+    }
+  }, []);
 
   const fetchArticles = useCallback(async () => {
     setIsLoading(true);
@@ -31,6 +49,7 @@ export function TechFeed() {
       if (!response.ok) throw new Error('記事の取得に失敗しました');
       const data = await response.json();
       setArticles(data.articles || []);
+      setIsPersonalSearchMode(false); // 初期読み込み時は通常モード
     } catch (err) {
       setError(err instanceof Error ? err.message : 'エラーが発生しました');
     } finally {
@@ -140,6 +159,29 @@ export function TechFeed() {
     handlers[type]?.();
   };
 
+  // パーソナルサーチハンドラ
+  const handlePersonalSearch = async (tags: string[]) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // 選択したタグをLocalStorageに保存
+      localStorage.setItem('personal-search-tags', JSON.stringify(tags));
+      setPersonalSearchTags(tags);
+
+      // 複数タグでAPI呼び出し
+      const tagsQuery = tags.join(',');
+      const response = await fetch(`/api/articles?tags=${encodeURIComponent(tagsQuery)}`);
+      if (!response.ok) throw new Error('記事の取得に失敗しました');
+      const data = await response.json();
+      setArticles(data.articles || []);
+      setIsPersonalSearchMode(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'エラーが発生しました');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // スコアリングで注目記事を選定
   const featuredArticle = useMemo(() => getFeaturedArticle(filteredArticles), [filteredArticles]);
 
@@ -167,6 +209,7 @@ export function TechFeed() {
           onFilterModeChange={setFilterMode}
           activeFilters={activeFilters}
           onRemoveFilter={handleRemoveFilter}
+          onPersonalSearchClick={() => setIsPersonalSearchOpen(true)}
         />
 
         {isLoading ? (
@@ -185,6 +228,14 @@ export function TechFeed() {
             </div>
           </>
         )}
+
+        {/* パーソナルサーチモーダル */}
+        <PersonalSearchModal
+          isOpen={isPersonalSearchOpen}
+          onClose={() => setIsPersonalSearchOpen(false)}
+          availableTags={tags.map(t => t.name)}
+          onSearch={handlePersonalSearch}
+        />
       </main>
     </>
   );

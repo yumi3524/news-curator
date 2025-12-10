@@ -53,7 +53,12 @@ export class QiitaAPIFetcher implements ArticleFetcher {
   private buildQueryParts(options?: FetchOptions): string[] {
     const parts: string[] = [];
 
-    if (options?.tag) {
+    // 複数タグのOR検索をサポート（パーソナルサーチ用）
+    if (options?.tags && options.tags.length > 0) {
+      const tagQuery = options.tags.map(tag => `tag:${tag}`).join(' OR ');
+      parts.push(`(${tagQuery})`);
+    } else if (options?.tag) {
+      // 既存の単一タグもサポート（後方互換性）
       parts.push(`tag:${options.tag}`);
     }
 
