@@ -13,25 +13,19 @@ interface TagCount {
 interface FilterSectionProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  sources: TagCount[];
-  selectedSources: Set<string>;
-  onSourceToggle: (source: string) => void;
   tags: TagCount[];
   selectedTags: Set<string>;
   onTagToggle: (tag: string) => void;
   filterMode: 'OR' | 'AND';
   onFilterModeChange: (mode: 'OR' | 'AND') => void;
-  activeFilters: Array<{ type: 'search' | 'source' | 'tag'; value: string }>;
+  activeFilters: Array<{ type: 'search' | 'tag'; value: string }>;
   onRemoveFilter: (type: string, value: string) => void;
-  onPersonalSearchClick: () => void; // パーソナルサーチボタンハンドラ
+  onPersonalSearchClick: () => void;
 }
 
 export function FilterSection({
   searchQuery,
   onSearchChange,
-  sources,
-  selectedSources,
-  onSourceToggle,
   tags,
   selectedTags,
   onTagToggle,
@@ -42,7 +36,6 @@ export function FilterSection({
   onPersonalSearchClick,
 }: FilterSectionProps) {
   const [isTagsExpanded, setIsTagsExpanded] = useState(false);
-  const [isSourcesExpanded, setIsSourcesExpanded] = useState(false);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const displayedTags = isTagsExpanded ? tags : tags.slice(0, 10);
 
@@ -129,41 +122,6 @@ export function FilterSection({
                   </>
                 )}
               </button>
-            )}
-          </div>
-        </div>
-
-        {/* Sources */}
-        <div className="mb-0 flex gap-4">
-          <div className="flex-1">
-            <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[var(--color-text-secondary)]">
-              <button
-                onClick={() => setIsSourcesExpanded(!isSourcesExpanded)}
-                className="flex items-center gap-1 transition-colors hover:text-[var(--color-text-primary)]"
-              >
-                <span>ソースで絞り込み</span>
-                {isSourcesExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </button>
-              {selectedSources.size > 0 && (
-                <span className="rounded-full bg-[var(--color-brand-primary)] px-2 py-0.5 text-xs font-bold text-[var(--color-text-on-accent)]">
-                  {selectedSources.size}
-                </span>
-              )}
-            </div>
-            {isSourcesExpanded && (
-              <div className="flex flex-wrap gap-2 animate-[slideIn_0.2s_ease-out]">
-                {sources.map((source) => (
-                  <Tag
-                    key={source.name}
-                    label={source.name}
-                    variant={selectedSources.has(source.name) ? 'selected' : 'outline'}
-                    size="md"
-                    count={source.count}
-                    onClick={() => onSourceToggle(source.name)}
-                    className="px-4 py-2 hover:-translate-y-0.5 hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
-                  />
-                ))}
-              </div>
             )}
           </div>
         </div>

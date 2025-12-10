@@ -18,7 +18,6 @@ export function TechFeed() {
   const [error, setError] = useState<string | null>(null);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSources, setSelectedSources] = useState<Set<string>>(new Set());
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
   const [filterMode, setFilterMode] = useState<'OR' | 'AND'>('OR');
 
@@ -61,15 +60,6 @@ export function TechFeed() {
     fetchArticles();
   }, [fetchArticles]);
 
-  const sources = useMemo<TagCount[]>(() => {
-    const sourceMap = new Map<string, number>();
-    articles.forEach((article) => {
-      const name = article.source.name;
-      sourceMap.set(name, (sourceMap.get(name) || 0) + 1);
-    });
-    return Array.from(sourceMap.entries()).map(([name, count]) => ({ name, count }));
-  }, [articles]);
-
   const tags = useMemo<TagCount[]>(() => {
     const tagMap = new Map<string, number>();
     articles.forEach((article) => {
@@ -93,10 +83,6 @@ export function TechFeed() {
         if (!matchesSearch) return false;
       }
 
-      if (selectedSources.size > 0 && !selectedSources.has(article.source.name)) {
-        return false;
-      }
-
       if (selectedTags.size > 0) {
         if (filterMode === 'AND') {
           return Array.from(selectedTags).every((tag) => article.tags.includes(tag));
@@ -107,27 +93,14 @@ export function TechFeed() {
 
       return true;
     });
-  }, [articles, searchQuery, selectedSources, selectedTags, filterMode]);
+  }, [articles, searchQuery, selectedTags, filterMode]);
 
   const activeFilters = useMemo(() => {
-    const filters: Array<{ type: 'search' | 'source' | 'tag'; value: string }> = [];
+    const filters: Array<{ type: 'search' | 'tag'; value: string }> = [];
     Array.from(selectedTags).forEach((tag) => filters.push({ type: 'tag', value: tag }));
-    Array.from(selectedSources).forEach((source) => filters.push({ type: 'source', value: source }));
     if (searchQuery) filters.push({ type: 'search', value: searchQuery });
     return filters;
-  }, [selectedTags, selectedSources, searchQuery]);
-
-  const handleSourceToggle = (source: string) => {
-    setSelectedSources((prev) => {
-      const next = new Set(prev);
-      if (next.has(source)) {
-        next.delete(source);
-      } else {
-        next.add(source);
-      }
-      return next;
-    });
-  };
+  }, [selectedTags, searchQuery]);
 
   const handleTagToggle = (tag: string) => {
     setSelectedTags((prev) => {
@@ -152,7 +125,6 @@ export function TechFeed() {
 
     const handlers: Record<string, () => void> = {
       tag: () => removeFromSet(setSelectedTags),
-      source: () => removeFromSet(setSelectedSources),
       search: () => setSearchQuery(''),
     };
 
@@ -199,9 +171,6 @@ export function TechFeed() {
         <FilterSection
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          sources={sources}
-          selectedSources={selectedSources}
-          onSourceToggle={handleSourceToggle}
           tags={tags}
           selectedTags={selectedTags}
           onTagToggle={handleTagToggle}
