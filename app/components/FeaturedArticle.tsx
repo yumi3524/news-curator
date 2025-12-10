@@ -2,18 +2,22 @@ import { Heart, Bookmark, Calendar, Sparkles } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import type { Article } from '@/app/types/types';
 import { formatDate } from '../lib/utils';
+import { useTagClickHandler } from '../lib/hooks/useTagClickHandler';
 
 interface FeaturedArticleProps {
   article: Article;
+  onTagClick?: (tag: string) => void;
 }
 
-export function FeaturedArticle({ article }: FeaturedArticleProps) {
+export function FeaturedArticle({ article, onTagClick }: FeaturedArticleProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
+
+  const handleTagClick = useTagClickHandler(onTagClick);
 
   return (
     <section className="mb-3 animate-[fadeIn_0.5s_ease-out_0.2s_both] md:mb-4">
@@ -33,12 +37,15 @@ export function FeaturedArticle({ article }: FeaturedArticleProps) {
           {/* Tags */}
           <div className="mb-2 flex flex-wrap gap-2">
             {article.tags.map((tag) => (
-              <span
+              <button
                 key={tag}
-                className="rounded-md bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-[var(--color-featured-text)] backdrop-blur-[10px]"
+                onClick={(e) => handleTagClick(e, tag)}
+                className="rounded-md bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-[var(--color-featured-text)] backdrop-blur-[10px] transition-all hover:bg-white/20 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-1"
+                aria-label={`${tag}でフィルタリング`}
+                type="button"
               >
                 {tag}
-              </span>
+              </button>
             ))}
           </div>
 

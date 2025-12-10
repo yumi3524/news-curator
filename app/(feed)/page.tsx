@@ -1,5 +1,5 @@
-import { NewsCurator } from '@/app/components/NewsCurator';
+import { TechFeed } from '@/app/components/TechFeed';
 
 export default function FeedPage() {
-  return <NewsCurator />;
+  return <TechFeed />;
 }

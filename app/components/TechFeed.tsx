@@ -11,7 +11,7 @@ import { EmptyState } from './EmptyState';
 import { ErrorState } from './ErrorState';
 import { getFeaturedArticle, sortByScore } from '@/app/lib/scoring';
 
-export function NewsCurator() {
+export function TechFeed() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -177,10 +177,10 @@ export function NewsCurator() {
           <EmptyState />
         ) : (
           <>
-            {featuredArticle && <FeaturedArticle article={featuredArticle} />}
+            {featuredArticle && <FeaturedArticle article={featuredArticle} onTagClick={handleTagToggle} />}
             <div className="grid animate-[fadeIn_0.5s_ease-out_0.3s_both] grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
               {regularArticles.map((article) => (
-                <ArticleCard key={article.id} article={article} />
+                <ArticleCard key={article.id} article={article} onTagClick={handleTagToggle} />
               ))}
             </div>
           </>

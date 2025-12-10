@@ -1,6 +1,7 @@
 "use client";
 
 import { Article } from "@/app/types/types";
+import { useTagClickHandler } from "@/app/lib/hooks/useTagClickHandler";
 
 /**
  * ArticleCardコンポーネントのProps
@@ -8,6 +9,7 @@ import { Article } from "@/app/types/types";
 interface ArticleCardProps {
   article: Article;
   onToggleFavorite: (articleId: string) => void;
+  onTagClick?: (tag: string) => void;
 }
 
 /**
@@ -28,6 +30,7 @@ interface ArticleCardProps {
 export default function ArticleCard({
   article,
   onToggleFavorite,
+  onTagClick,
 }: ArticleCardProps) {
   /**
    * 日付を日本語形式でフォーマット
@@ -50,6 +53,8 @@ export default function ArticleCard({
     e.stopPropagation();
     onToggleFavorite(article.id);
   };
+
+  const handleTagClick = useTagClickHandler(onTagClick);
 
   return (
     <article
@@ -179,12 +184,15 @@ export default function ArticleCard({
             data-testid="article-tags"
           >
             {article.tags.map((tag) => (
-              <span
+              <button
                 key={tag}
-                className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100"
+                onClick={(e) => handleTagClick(e, tag)}
+                className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
+                aria-label={`${tag}でフィルタリング`}
+                type="button"
               >
                 {tag}
-              </span>
+              </button>
             ))}
           </div>
         )}

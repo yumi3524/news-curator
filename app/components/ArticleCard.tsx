@@ -2,12 +2,16 @@ import { Heart, Bookmark } from 'lucide-react';
 import type { Article } from '@/app/types/types';
 
 import { MAX_TAGS_TO_DISPLAY } from '@/app/lib/constants';
+import { useTagClickHandler } from '@/app/lib/hooks/useTagClickHandler';
 
 interface ArticleCardProps {
   article: Article;
+  onTagClick?: (tag: string) => void;
 }
 
-export function ArticleCard({ article }: ArticleCardProps) {
+export function ArticleCard({ article, onTagClick }: ArticleCardProps) {
+  const handleTagClick = useTagClickHandler(onTagClick);
+
   return (
     <a
       href={article.url}
@@ -18,12 +22,15 @@ export function ArticleCard({ article }: ArticleCardProps) {
       {/* Tags */}
       <div className="mb-3.5 flex min-h-[28px] flex-wrap gap-1.5">
         {article.tags.slice(0, MAX_TAGS_TO_DISPLAY).map((tag) => (
-          <span
+          <button
             key={tag}
-            className="whitespace-nowrap rounded bg-[var(--color-bg-tertiary)] px-2.5 py-1 text-xs font-semibold text-[var(--color-text-secondary)]"
+            onClick={(e) => handleTagClick(e, tag)}
+            className="whitespace-nowrap rounded bg-[var(--color-bg-tertiary)] px-2.5 py-1 text-xs font-semibold text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-brand-primary)] hover:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-primary)] focus:ring-offset-1"
+            aria-label={`${tag}でフィルタリング`}
+            type="button"
           >
             {tag}
-          </span>
+          </button>
         ))}
       </div>
 

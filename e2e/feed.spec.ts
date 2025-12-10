@@ -16,17 +16,22 @@ test.describe("フィードページ", () => {
     await page.reload();
   });
 
-  test("ページタイトルとヘッダーが表示されること", async ({ page }) => {
-    // ヘッダーのタイトルを確認
+  test("displays the main title", async ({ page }) => {
+    await page.goto("/");
+    
+    // Wait for the heading to be visible
     await expect(
-      page.getByRole("heading", { name: "News Curator" })
+      page.getByRole("heading", { name: "Tech Feed" })
     ).toBeVisible();
+  });
 
-    // 説明文を確認
-    await expect(
-      page.getByText("毎朝3分でキャッチアップできる技術ニュースダッシュボード")
-    ).toBeVisible();
-
+  test("displays articles", async ({ page }) => {
+    await page.goto("/");
+    
+    // Wait for articles to load
+    await page.waitForSelector("[data-testid='article-card']", {
+      timeout: 10000,
+    });
     // テーマ切り替えボタンの確認
     await expect(
       page.getByRole("button", { name: "ダークモードに切り替え" })
