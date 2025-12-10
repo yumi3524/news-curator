@@ -5,12 +5,6 @@ import { FilterSection } from '../FilterSection';
 const mockProps = {
   searchQuery: '',
   onSearchChange: vi.fn(),
-  sources: [
-    { name: 'Qiita', count: 10 },
-    { name: 'Zenn', count: 5 },
-  ],
-  selectedSources: new Set<string>(),
-  onSourceToggle: vi.fn(),
   tags: [
     { name: 'TypeScript', count: 15 },
     { name: 'React', count: 12 },
@@ -66,38 +60,7 @@ describe('FilterSection', () => {
     expect(mockProps.onTagToggle).toHaveBeenCalledWith('TypeScript');
   });
 
-  it('ソースフィルターがデフォルトで閉じていること', () => {
-    render(<FilterSection {...mockProps} />);
 
-    // ソース名が表示されていないことを確認
-    expect(screen.queryByText('Qiita')).not.toBeInTheDocument();
-    expect(screen.queryByText('Zenn')).not.toBeInTheDocument();
-  });
-
-  it('「ソースで絞り込み」をクリックするとソースが表示されること', () => {
-    render(<FilterSection {...mockProps} />);
-
-    const sourceToggle = screen.getByText('ソースで絞り込み');
-    fireEvent.click(sourceToggle);
-
-    // ソース名が表示されることを確認
-    expect(screen.getByText('Qiita')).toBeInTheDocument();
-    expect(screen.getByText('Zenn')).toBeInTheDocument();
-  });
-
-  it('ソースクリック時にonSourceToggleが呼ばれること', () => {
-    render(<FilterSection {...mockProps} />);
-
-    // まずソースセクションを開く
-    const sourceToggle = screen.getByText('ソースで絞り込み');
-    fireEvent.click(sourceToggle);
-
-    // Qiitaをクリック
-    const qiitaSource = screen.getByText('Qiita');
-    fireEvent.click(qiitaSource);
-
-    expect(mockProps.onSourceToggle).toHaveBeenCalledWith('Qiita');
-  });
 
   it('フィルターモード切り替えボタンが表示されること', () => {
     render(<FilterSection {...mockProps} />);
@@ -134,24 +97,13 @@ describe('FilterSection', () => {
     expect(typeScriptTag).toHaveClass('bg-[var(--color-brand-primary)]');
   });
 
-  it('選択されたソース数がバッジに表示されること', () => {
-    const propsWithSelectedSources = {
-      ...mockProps,
-      selectedSources: new Set(['Qiita', 'Zenn']),
-    };
 
-    render(<FilterSection {...propsWithSelectedSources} />);
-
-    // バッジに「2」が表示されることを確認
-    expect(screen.getByText('2')).toBeInTheDocument();
-  });
 
   it('アクティブフィルターが表示されること', () => {
     const propsWithActiveFilters = {
       ...mockProps,
       activeFilters: [
         { type: 'tag' as const, value: 'TypeScript' },
-        { type: 'source' as const, value: 'Qiita' },
       ],
     };
 
