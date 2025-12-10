@@ -39,7 +39,8 @@ export interface ArticleFetcher {
  * フェッチオプション
  */
 export interface FetchOptions {
-  tag?: string;
+  tag?: string; // 単一タグ（後方互換性のため保持）
+  tags?: string[]; // 複数タグ（OR検索）- パーソナルサーチで使用
   user?: string;
   limit?: number;
   days?: number; // 過去N日間の記事を取得

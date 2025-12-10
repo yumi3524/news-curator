@@ -6,10 +6,12 @@ import { FetchOptions } from "@/app/lib/fetchers/types";
  * 外部ソースから記事を取得するAPI
  *
  * GET /api/articles?source=qiita&tag=React&limit=50&days=7&sortBy=likes
+ * GET /api/articles?tags=React,Next.js,TypeScript  (パーソナルサーチ用)
  *
  * クエリパラメータ:
  * - source: ソース名（現在は "qiita" のみサポート）
  * - tag: フィルタリングするタグ（オプション）
+ * - tags: 複数タグ（カンマ区切り）でOR検索（パーソナルサーチ用）
  * - limit: 取得する記事数（デフォルト: 30）
  * - days: 過去N日間の記事を取得（オプション、デフォルト: 7日）
  * - sortBy: ソート順 created|likes|stocks（オプション、デフォルト: likes）
@@ -20,6 +22,8 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const source = searchParams.get("source") || "qiita";
   const tag = searchParams.get("tag") || undefined;
+  const tagsParam = searchParams.get("tags"); // パーソナルサーチ用
+  const tags = tagsParam ? tagsParam.split(',').map(t => t.trim()) : undefined;
   const limitParam = searchParams.get("limit");
   const limit = limitParam ? parseInt(limitParam, 10) : DEFAULT_FETCH_LIMIT;
   const daysParam = searchParams.get("days");
@@ -32,7 +36,8 @@ export async function GET(request: Request) {
     switch (source) {
       case "qiita": {
         const qiitaFetcher = new QiitaAPIFetcher();
-        articles = await qiitaFetcher.fetch({ tag, limit, days, sortBy });
+        // tagsがtagより優先（パーソナルサーチの場合）
+        articles = await qiitaFetcher.fetch({ tags, tag, limit, days, sortBy });
         break;
       }
       default:

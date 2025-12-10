@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import type { Article } from '@/app/types/types';
 import { formatDate } from '../lib/utils';
 import { useTagClickHandler } from '../lib/hooks/useTagClickHandler';
+import { Tag } from './Tag';
+import { Badge } from './Badge';
 
 interface FeaturedArticleProps {
   article: Article;
@@ -37,20 +39,22 @@ export function FeaturedArticle({ article, onTagClick }: FeaturedArticleProps) {
           {/* Tags - モバイル: 横スクロール, デスクトップ: 折り返し */}
           <div className="mb-2 flex gap-2 overflow-x-auto flex-nowrap md:flex-wrap md:overflow-x-visible scrollbar-hide">
             {article.tags.slice(0, 5).map((tag) => (
-              <button
+              <Tag
                 key={tag}
+                label={tag}
+                variant="featured"
+                size="sm"
                 onClick={(e) => handleTagClick(e, tag)}
-                className="whitespace-nowrap rounded-md bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-[var(--color-featured-text)] backdrop-blur-[10px] transition-all hover:bg-white/20 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-1"
                 aria-label={`${tag}でフィルタリング`}
-                type="button"
-              >
-                {tag}
-              </button>
+              />
             ))}
             {article.tags.length > 5 && (
-              <span className="whitespace-nowrap rounded-md bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-[var(--color-featured-text)] backdrop-blur-[10px]">
-                +{article.tags.length - 5}
-              </span>
+              <Tag
+                label={`+${article.tags.length - 5}`}
+                variant="featured"
+                size="sm"
+                isClickable={false}
+              />
             )}
           </div>
 
@@ -65,23 +69,19 @@ export function FeaturedArticle({ article, onTagClick }: FeaturedArticleProps) {
           </p>
 
           {/* Meta */}
-          <div className="flex gap-6 text-sm text-[var(--color-featured-text)]/85">
+          <div className="flex gap-6">
             {article.likesCount !== undefined && (
-              <div className="flex items-center gap-2">
-                <Heart className="h-4 w-4" />
-                <span>{article.likesCount}</span>
-              </div>
+              <Badge icon={<Heart className="h-4 w-4" />} label={article.likesCount} variant="muted" size="md" />
             )}
             {article.stocksCount !== undefined && (
-              <div className="flex items-center gap-2">
-                <Bookmark className="h-4 w-4" />
-                <span>{article.stocksCount}</span>
-              </div>
+              <Badge icon={<Bookmark className="h-4 w-4" />} label={article.stocksCount} variant="muted" size="md" />
             )}
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              <span>{mounted ? formatDate(article.publishedAt) : '—'}</span>
-            </div>
+            <Badge
+              icon={<Calendar className="h-4 w-4" />}
+              label={mounted ? formatDate(article.publishedAt) : '—'}
+              variant="muted"
+              size="md"
+            />
           </div>
         </div>
       </a>
