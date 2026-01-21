@@ -31,12 +31,14 @@ AI・Web技術・スタートアップなど、興味のある分野の最新記
 - **Qiita API 連携**: Qiita API v2 を利用して最新記事をサーバーサイドで取得
 - **リッチな情報表示**: 記事の「いいね数」「ストック数」を表示して人気度を可視化
 - **タグフィルタリング**: 興味のある技術タグ（React, Next.js等）で記事を絞り込み
+- **パーソナルサーチ**: 関心のあるタグを設定し、パーソナライズされた記事を取得
 - **注目記事（PICK UP!）**: 特に注目すべき記事をハイライト表示
 - **ダークモード**: ワンクリックでライト/ダークテーマを切り替え
 - **レスポンシブ UI**: PC・スマホ問わず快適に閲覧できるカード型レイアウト
 - **包括的なテスト**: Vitest、React Testing Library、Playwrightによるユニット・E2Eテスト
 - **Storybook**: コンポーネントの開発・ドキュメント環境
 - **充実したUIフィードバック**: ローディング、エラー、空状態の適切な表示
+- **データソース切り替え**: 環境変数でキャッシュ/直接APIを切り替え可能
 
 ### 今後の開発計画 (Roadmap)
 詳細は [ROADMAP.md](./ROADMAP.md) をご覧ください。
@@ -50,7 +52,6 @@ tech-feed/
 ├── app/
 │   ├── (feed)/           # フィード機能（ルートグループ）
 │   │   ├── _components/  # フィード専用コンポーネント
-│   │   │   ├── ArticleCard.tsx
 │   │   │   ├── FilterPanel.tsx
 │   │   │   └── __tests__/
 │   │   └── page.tsx      # メインページ
@@ -58,31 +59,34 @@ tech-feed/
 │   │   └── articles/
 │   ├── components/       # 共通UIコンポーネント
 │   │   ├── TechFeed.tsx
+│   │   ├── ArticleCard.tsx
 │   │   ├── FeaturedArticle.tsx
 │   │   ├── FilterSection.tsx
 │   │   ├── Header.tsx
 │   │   ├── ThemeSwitcher.tsx
+│   │   ├── PersonalSearchModal.tsx
 │   │   ├── LoadingState.tsx
 │   │   ├── ErrorState.tsx
 │   │   ├── EmptyState.tsx
 │   │   └── __tests__/    # コンポーネントテスト
 │   ├── lib/
 │   │   ├── fetchers/     # データ取得ロジック
-│   │   │   ├── qiita.ts
-│   │   │   ├── qiita-api.ts
-│   │   │   └── types.ts
+│   │   │   ├── qiita.ts      # Qiita RSS フェッチャー
+│   │   │   ├── qiita-api.ts  # Qiita API v2 フェッチャー
+│   │   │   ├── cache.ts      # キャッシュ フェッチャー
+│   │   │   └── types.ts      # 共通インターフェース
 │   │   ├── hooks/        # カスタムフック
 │   │   ├── api.ts        # API共通ロジック
 │   │   ├── constants.ts  # 定数定義
-│   │   ├── filterArticles.ts
 │   │   ├── scoring.ts    # 記事スコアリング
 │   │   └── utils.ts
 │   ├── types/            # 共通型定義
 │   ├── globals.css       # グローバルスタイル・テーマ
 │   └── layout.tsx        # ルートレイアウト
 ├── e2e/                  # E2Eテスト（Playwright）
+├── public/
+│   └── cache/            # キャッシュJSON（開発用）
 ├── .storybook/           # Storybookの設定
-├── public/               # 静的ファイル
 └── docs/                 # ドキュメント
 ```
 
@@ -203,9 +207,16 @@ test: テスト追加・修正
 
 ## ドキュメント（Documentation）
 
+### 設計・仕様書
+- [システム設計書](./docs/design-document.md) - アーキテクチャ、技術スタック、コンポーネント設計
+- [機能仕様書](./docs/specification-document.md) - 機能詳細、画面仕様、API仕様
+
+### 開発ガイド
 - [ROADMAP.md](./ROADMAP.md) - 開発ロードマップ
+- [Hacker News統合計画](./docs/hackernews-implementation-plan.md) - Hacker News API統合の実装計画
 - [API統合ガイド](./docs/api-integration.md) - 外部API統合の手順
 - [フィルタリング仕様](./docs/filter-cases.md) - タグフィルタリングの実装仕様
+- [テスト戦略](./docs/testing-strategy.md) - テストアプローチとベストプラクティス
 
 ---
 

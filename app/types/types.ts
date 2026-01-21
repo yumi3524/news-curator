@@ -42,3 +42,15 @@ export interface TagCount {
   name: string;
   count: number;
 }
+
+/**
+ * フィルタ条件の型定義
+ */
+export interface FilterOptions {
+  /** 選択されたソースID（複数選択可能） */
+  selectedSources: string[];
+  /** 選択されたタグ（複数選択可能） */
+  selectedTags: string[];
+  /** キーワード検索文字列 */
+  searchKeyword: string;
+}

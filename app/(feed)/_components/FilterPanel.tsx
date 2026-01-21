@@ -1,4 +1,4 @@
-import { FilterOptions } from "@/app/lib/filterArticles";
+import type { FilterOptions } from "@/app/types/types";
 
 /**
  * FilterPanelのProps
