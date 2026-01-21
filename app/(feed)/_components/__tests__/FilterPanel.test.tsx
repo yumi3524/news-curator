@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import FilterPanel from "../FilterPanel";
-import { FilterOptions } from "@/app/lib/filterArticles";
+import type { FilterOptions } from "@/app/types/types";
 
 // contextはdescribeのエイリアス（日本語的な可読性向上のため）
 const context = describe;

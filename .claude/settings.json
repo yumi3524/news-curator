@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm test:*)",
+      "Bash(pnpm lint)",
+      "Bash(pnpm type-check)",
+      "Bash(pnpm build)",
+      "Bash(pnpm dev)",
+      "Bash(pnpm storybook)",
+      "Bash(npx playwright test:*)",
+      "Bash(git status)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(ls:*)"
+    ],
+    "deny": [
+      "Bash(sudo *)",
+      "Bash(rm -rf *)",
+      "Bash(chmod 777 *)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(cat *.env*)",
+      "Bash(cat *id_rsa*)",
+      "Bash(cat *.pem)",
+      "Bash(cd ../*)"
+    ]
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2025-12-20T00:00:00Z",
+  "source": {
+    "name": "qiita",
+    "type": "rest_api",
+    "endpoint": "https://qiita.com/api/v2/items",
+    "fetchedCount": 3
+  },
+  "window": {
+    "limit": 250,
+    "rangeDays": 7,
+    "note": "Sample cache for development"
+  },
+  "articles": [
+    {
+      "id": "test-article-1",
+      "title": "Next.js 15の新機能まとめ",
+      "url": "https://example.com/nextjs-15",
+      "publishedAt": "2025-12-19T10:00:00Z",
+      "source": "qiita",
+      "author": {
+        "id": "testuser1",
+        "name": "テストユーザー1",
+        "avatarUrl": "https://placehold.co/40x40"
+      },
+      "tags": ["Next.js", "React", "TypeScript"],
+      "likes": 150
+    },
+    {
+      "id": "test-article-2",
+      "title": "TypeScript 5.0の型システム改善",
+      "url": "https://example.com/typescript-5",
+      "publishedAt": "2025-12-18T14:30:00Z",
+      "source": "qiita",
+      "author": {
+        "id": "testuser2",
+        "name": "テストユーザー2",
+        "avatarUrl": "https://placehold.co/40x40"
+      },
+      "tags": ["TypeScript", "JavaScript"],
+      "likes": 200
+    },
+    {
+      "id": "test-article-3",
+      "title": "Reactパフォーマンス最適化テクニック",
+      "url": "https://example.com/react-perf",
+      "publishedAt": "2025-12-17T09:15:00Z",
+      "source": "qiita",
+      "author": {
+        "id": "testuser3",
+        "name": "テストユーザー3",
+        "avatarUrl": "https://placehold.co/40x40"
+      },
+      "tags": ["React", "Performance", "JavaScript"],
+      "likes": 85
+    }
+  ],
+  "tagCounts": {
+    "Next.js": 1,
+    "React": 2,
+    "TypeScript": 2,
+    "JavaScript": 2,
+    "Performance": 1
+  },
+  "tagIndex": {
+    "Next.js": ["test-article-1"],
+    "React": ["test-article-1", "test-article-3"],
+    "TypeScript": ["test-article-1", "test-article-2"],
+    "JavaScript": ["test-article-2", "test-article-3"],
+    "Performance": ["test-article-3"]
+  },
+  "stats": {
+    "uniqueTags": 5,
+    "totalArticles": 3
+  }
+}
