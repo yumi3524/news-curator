@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { QiitaAPIFetcher } from "@/app/lib/fetchers/qiita-api";
 import { QiitaRSSFetcher } from "@/app/lib/fetchers/qiita";
 import { CacheFetcher } from "@/app/lib/fetchers/cache";
 import type { ArticleFetcher } from "@/app/lib/fetchers/types";
@@ -11,14 +12,17 @@ import type { ArticleFetcher } from "@/app/lib/fetchers/types";
  *
  * データソース切り替え:
  * - 環境変数 ARTICLE_SOURCE で制御
- * - "qiita-rss": Qiita RSSから直接取得（デフォルト）
+ * - "qiita-api": Qiita API v2から取得（デフォルト、いいね数/タグ取得可能）
+ * - "qiita-rss": Qiita RSSから取得（いいね数/タグ取得不可）
  * - "cache": ローカル/S3キャッシュから取得
  */
 
-type ArticleSource = "cache" | "qiita-rss";
+type ArticleSource = "cache" | "qiita-rss" | "qiita-api";
 
 function createFetcher(source: ArticleSource): ArticleFetcher {
   switch (source) {
+    case "qiita-api":
+      return new QiitaAPIFetcher();
     case "qiita-rss":
       return new QiitaRSSFetcher();
     case "cache":
@@ -30,7 +34,7 @@ function createFetcher(source: ArticleSource): ArticleFetcher {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const tag = searchParams.get("tag") || undefined;
-  const source = (process.env.ARTICLE_SOURCE || "qiita-rss") as ArticleSource;
+  const source = (process.env.ARTICLE_SOURCE || "qiita-api") as ArticleSource;
 
   try {
     const fetcher = createFetcher(source);
