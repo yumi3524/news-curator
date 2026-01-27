@@ -1,11 +1,17 @@
-import type { FilterOptions } from "@/app/types/types";
+import type { FilterOptions, Source } from "@/app/types/types";
+
+/** ソース情報 */
+interface SourceInfo {
+  id: Source;
+  name: string;
+}
 
 /**
  * FilterPanelのProps
  */
 interface FilterPanelProps {
   /** 利用可能なソースのリスト */
-  availableSources: Array<{ id: string; name: string }>;
+  availableSources: SourceInfo[];
   /** 利用可能なタグのリスト */
   availableTags: string[];
   /** 現在のフィルタ状態 */
@@ -28,7 +34,7 @@ export default function FilterPanel({
   /**
    * ソース選択の切り替え
    */
-  const handleSourceToggle = (sourceId: string) => {
+  const handleSourceToggle = (sourceId: Source) => {
     const newSelectedSources = filters.selectedSources.includes(sourceId)
       ? filters.selectedSources.filter((id) => id !== sourceId)
       : [...filters.selectedSources, sourceId];

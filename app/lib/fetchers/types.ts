@@ -1,6 +1,7 @@
 /**
  * 外部ソースから取得した記事データの共通型定義
  */
+import type { Source } from '@/app/types/types';
 
 /**
  * 外部ソースから取得した生の記事データ
@@ -12,15 +13,31 @@ export interface ExternalArticle {
   description: string;
   url: string;
   publishedAt: string; // ISO 8601形式
-  source: {
-    id: string;
-    name: string;
-  };
+  source: Source;
   author?: string;
   tags: string[];
   imageUrl?: string;
-  likesCount?: number; // いいね数（人気度の指標）
-  stocksCount?: number; // ストック数（Qiita特有）
+
+  // Qiita固有
+  likesCount?: number;
+  stocksCount?: number;
+
+  // Hacker News固有
+  score?: number;
+  commentsCount?: number;
+
+  // GitHub固有
+  stars?: number;
+  forks?: number;
+  language?: string;
+
+  // 翻訳（HN用）
+  titleJa?: string;
+  descriptionJa?: string;
+  isTranslated?: boolean;
+
+  // 読了時間
+  readingTimeMinutes?: number;
 }
 
 /**

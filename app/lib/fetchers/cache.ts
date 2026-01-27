@@ -33,16 +33,21 @@ export class CacheFetcher implements ArticleFetcher {
    * CacheArticle → ExternalArticle 変換
    */
   private mapCacheToExternal(article: CacheArticle): ExternalArticle {
+    // キャッシュのsource文字列をSource型に変換
+    const sourceMap: Record<string, 'qiita' | 'hackernews' | 'github'> = {
+      'qiita': 'qiita',
+      'hackernews': 'hackernews',
+      'github': 'github',
+    };
+    const source = sourceMap[article.source] || 'qiita';
+
     return {
       id: article.id,
       title: article.title,
       description: '', // キャッシュには含まれていない
       url: article.url,
       publishedAt: article.publishedAt,
-      source: {
-        id: article.source,
-        name: article.source === 'qiita' ? 'Qiita' : article.source
-      },
+      source,
       author: article.author.id,
       tags: article.tags,
       imageUrl: article.author.avatarUrl,

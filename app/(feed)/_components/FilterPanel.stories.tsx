@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import FilterPanel from "./FilterPanel";
+import type { Source } from "@/app/types/types";
 
 /**
  * FilterPanelコンポーネントのStorybook
@@ -9,6 +10,8 @@ import FilterPanel from "./FilterPanel";
  * - フィルタ選択済み状態
  * - ソース・タグが多い場合
  * - ソース・タグが少ない場合
+ *
+ * @deprecated タブUIに移行予定
  */
 const meta = {
   title: "Feed/FilterPanel",
@@ -32,17 +35,20 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** 利用可能なソース一覧 */
+const availableSources: Array<{ id: Source; name: string }> = [
+  { id: "qiita", name: "Qiita" },
+  { id: "hackernews", name: "Hacker News" },
+  { id: "github", name: "GitHub" },
+];
+
 /**
  * デフォルト状態
  * フィルタが未選択の初期状態
  */
 export const Default: Story = {
   args: {
-    availableSources: [
-      { id: "tech-blog", name: "Tech Blog" },
-      { id: "dev-community", name: "Dev Community" },
-      { id: "qiita", name: "Qiita" },
-    ],
+    availableSources,
     availableTags: ["React", "JavaScript", "TypeScript", "Next.js", "Frontend"],
     filters: {
       selectedSources: [],
@@ -59,14 +65,10 @@ export const Default: Story = {
  */
 export const WithFiltersApplied: Story = {
   args: {
-    availableSources: [
-      { id: "tech-blog", name: "Tech Blog" },
-      { id: "dev-community", name: "Dev Community" },
-      { id: "qiita", name: "Qiita" },
-    ],
+    availableSources,
     availableTags: ["React", "JavaScript", "TypeScript", "Next.js", "Frontend"],
     filters: {
-      selectedSources: ["tech-blog", "qiita"],
+      selectedSources: ["qiita", "github"],
       selectedTags: ["React", "TypeScript"],
       searchKeyword: "hooks",
     },
@@ -80,14 +82,10 @@ export const WithFiltersApplied: Story = {
  */
 export const WithSourcesOnly: Story = {
   args: {
-    availableSources: [
-      { id: "tech-blog", name: "Tech Blog" },
-      { id: "dev-community", name: "Dev Community" },
-      { id: "qiita", name: "Qiita" },
-    ],
+    availableSources,
     availableTags: ["React", "JavaScript", "TypeScript", "Next.js", "Frontend"],
     filters: {
-      selectedSources: ["dev-community"],
+      selectedSources: ["hackernews"],
       selectedTags: [],
       searchKeyword: "",
     },
@@ -101,11 +99,7 @@ export const WithSourcesOnly: Story = {
  */
 export const WithTagsOnly: Story = {
   args: {
-    availableSources: [
-      { id: "tech-blog", name: "Tech Blog" },
-      { id: "dev-community", name: "Dev Community" },
-      { id: "qiita", name: "Qiita" },
-    ],
+    availableSources,
     availableTags: ["React", "JavaScript", "TypeScript", "Next.js", "Frontend"],
     filters: {
       selectedSources: [],
@@ -122,11 +116,7 @@ export const WithTagsOnly: Story = {
  */
 export const WithKeywordOnly: Story = {
   args: {
-    availableSources: [
-      { id: "tech-blog", name: "Tech Blog" },
-      { id: "dev-community", name: "Dev Community" },
-      { id: "qiita", name: "Qiita" },
-    ],
+    availableSources,
     availableTags: ["React", "JavaScript", "TypeScript", "Next.js", "Frontend"],
     filters: {
       selectedSources: [],
@@ -138,20 +128,12 @@ export const WithKeywordOnly: Story = {
 };
 
 /**
- * ソース・タグが多い場合
+ * タグが多い場合
  * 選択肢が多数ある状態でのレイアウト確認
  */
-export const ManySourcesAndTags: Story = {
+export const ManyTags: Story = {
   args: {
-    availableSources: [
-      { id: "tech-blog", name: "Tech Blog" },
-      { id: "dev-community", name: "Dev Community" },
-      { id: "qiita", name: "Qiita" },
-      { id: "zenn", name: "Zenn" },
-      { id: "hacker-news", name: "Hacker News" },
-      { id: "medium", name: "Medium" },
-      { id: "dev-to", name: "DEV.to" },
-    ],
+    availableSources,
     availableTags: [
       "React",
       "JavaScript",
@@ -173,7 +155,7 @@ export const ManySourcesAndTags: Story = {
       "DevOps",
     ],
     filters: {
-      selectedSources: ["tech-blog", "qiita", "zenn"],
+      selectedSources: ["qiita", "github"],
       selectedTags: ["React", "TypeScript", "Next.js", "Frontend"],
       searchKeyword: "",
     },
@@ -182,15 +164,12 @@ export const ManySourcesAndTags: Story = {
 };
 
 /**
- * ソース・タグが少ない場合
+ * タグが少ない場合
  * 選択肢が少ない状態でのレイアウト確認
  */
-export const FewSourcesAndTags: Story = {
+export const FewTags: Story = {
   args: {
-    availableSources: [
-      { id: "tech-blog", name: "Tech Blog" },
-      { id: "qiita", name: "Qiita" },
-    ],
+    availableSources,
     availableTags: ["React", "JavaScript"],
     filters: {
       selectedSources: [],
@@ -207,14 +186,10 @@ export const FewSourcesAndTags: Story = {
  */
 export const AllSelected: Story = {
   args: {
-    availableSources: [
-      { id: "tech-blog", name: "Tech Blog" },
-      { id: "dev-community", name: "Dev Community" },
-      { id: "qiita", name: "Qiita" },
-    ],
+    availableSources,
     availableTags: ["React", "JavaScript", "TypeScript", "Next.js", "Frontend"],
     filters: {
-      selectedSources: ["tech-blog", "dev-community", "qiita"],
+      selectedSources: ["qiita", "hackernews", "github"],
       selectedTags: ["React", "JavaScript", "TypeScript", "Next.js", "Frontend"],
       searchKeyword: "tutorial",
     },

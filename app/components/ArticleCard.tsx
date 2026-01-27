@@ -1,11 +1,18 @@
 'use client';
 
 import { Heart, Bookmark } from 'lucide-react';
-import type { Article } from '../types/types';
+import type { Article, Source } from '../types/types';
 import { MAX_TAGS_TO_DISPLAY_MOBILE } from '../lib/constants';
 import { useTagClickHandler } from '../lib/hooks/useTagClickHandler';
 import { Tag } from './Tag';
 import { Badge } from './Badge';
+
+/** ソース表示名のマッピング */
+const SOURCE_DISPLAY_NAMES: Record<Source, string> = {
+  qiita: 'Qiita',
+  hackernews: 'HN',
+  github: 'GitHub',
+};
 
 interface ArticleCardProps {
   article: Article;
@@ -107,7 +114,7 @@ export function ArticleCard({ article, onTagClick, onToggleFavorite }: ArticleCa
           </div>
 
           <div className="text-xs font-semibold uppercase tracking-wide text-[var(--color-brand-primary)]">
-            {article.source.name}
+            {SOURCE_DISPLAY_NAMES[article.source]}
           </div>
         </div>
       </a>

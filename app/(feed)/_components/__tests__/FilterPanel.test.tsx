@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import FilterPanel from "../FilterPanel";
-import type { FilterOptions } from "@/app/types/types";
+import type { FilterOptions, Source } from "@/app/types/types";
 
 // contextはdescribeのエイリアス（日本語的な可読性向上のため）
 const context = describe;
@@ -14,14 +14,16 @@ const context = describe;
  * - ソースフィルタ（チェックボックス）
  * - タグフィルタ（チップボタン）
  * - フィルタクリア機能
+ *
+ * @deprecated タブUIに移行予定
  */
 
 describe("FilterPanel", () => {
   // テスト用のモックデータ
-  const mockAvailableSources = [
-    { id: "tech-blog", name: "Tech Blog" },
-    { id: "dev-community", name: "Dev Community" },
+  const mockAvailableSources: Array<{ id: Source; name: string }> = [
     { id: "qiita", name: "Qiita" },
+    { id: "hackernews", name: "Hacker News" },
+    { id: "github", name: "GitHub" },
   ];
 
   const mockAvailableTags = [
@@ -76,9 +78,9 @@ describe("FilterPanel", () => {
       it("すべてのソースが表示されること", () => {
         renderFilterPanel();
 
-        expect(screen.getByTestId("source-checkbox-tech-blog")).toBeInTheDocument();
-        expect(screen.getByTestId("source-checkbox-dev-community")).toBeInTheDocument();
         expect(screen.getByTestId("source-checkbox-qiita")).toBeInTheDocument();
+        expect(screen.getByTestId("source-checkbox-hackernews")).toBeInTheDocument();
+        expect(screen.getByTestId("source-checkbox-github")).toBeInTheDocument();
       });
 
       it("すべてのタグが表示されること", () => {
@@ -151,13 +153,13 @@ describe("FilterPanel", () => {
       it("未選択のソースを選択すると、selectedSourcesに追加されること", () => {
         renderFilterPanel();
 
-        const checkbox = screen.getByTestId("source-checkbox-tech-blog");
+        const checkbox = screen.getByTestId("source-checkbox-qiita");
         fireEvent.click(checkbox);
 
-        // onFiltersChangeが呼ばれ、tech-blogが追加されていることを確認
+        // onFiltersChangeが呼ばれ、qiitaが追加されていることを確認
         expect(mockOnFiltersChange).toHaveBeenCalledTimes(1);
         expect(mockOnFiltersChange).toHaveBeenCalledWith({
-          selectedSources: ["tech-blog"],
+          selectedSources: ["qiita"],
           selectedTags: [],
           searchKeyword: "",
         });
@@ -165,15 +167,15 @@ describe("FilterPanel", () => {
 
       it("選択済みのソースを再度クリックすると、selectedSourcesから削除されること", () => {
         renderFilterPanel({
-          selectedSources: ["tech-blog"],
+          selectedSources: ["qiita"],
           selectedTags: [],
           searchKeyword: "",
         });
 
-        const checkbox = screen.getByTestId("source-checkbox-tech-blog");
+        const checkbox = screen.getByTestId("source-checkbox-qiita");
         fireEvent.click(checkbox);
 
-        // tech-blogが削除されていることを確認
+        // qiitaが削除されていることを確認
         expect(mockOnFiltersChange).toHaveBeenCalledWith({
           selectedSources: [],
           selectedTags: [],
@@ -183,17 +185,17 @@ describe("FilterPanel", () => {
 
       it("複数のソースを同時に選択できること", () => {
         renderFilterPanel({
-          selectedSources: ["tech-blog"],
+          selectedSources: ["qiita"],
           selectedTags: [],
           searchKeyword: "",
         });
 
-        const checkbox = screen.getByTestId("source-checkbox-dev-community");
+        const checkbox = screen.getByTestId("source-checkbox-hackernews");
         fireEvent.click(checkbox);
 
-        // tech-blogとdev-communityの両方が選択されていることを確認
+        // qiitaとhackernewsの両方が選択されていることを確認
         expect(mockOnFiltersChange).toHaveBeenCalledWith({
-          selectedSources: ["tech-blog", "dev-community"],
+          selectedSources: ["qiita", "hackernews"],
           selectedTags: [],
           searchKeyword: "",
         });
@@ -201,18 +203,18 @@ describe("FilterPanel", () => {
 
       it("選択済みのソースはchecked状態になること", () => {
         renderFilterPanel({
-          selectedSources: ["tech-blog", "qiita"],
+          selectedSources: ["qiita", "github"],
           selectedTags: [],
           searchKeyword: "",
         });
 
-        const techBlogCheckbox = screen.getByTestId("source-checkbox-tech-blog") as HTMLInputElement;
-        const devCommunityCheckbox = screen.getByTestId("source-checkbox-dev-community") as HTMLInputElement;
         const qiitaCheckbox = screen.getByTestId("source-checkbox-qiita") as HTMLInputElement;
+        const hnCheckbox = screen.getByTestId("source-checkbox-hackernews") as HTMLInputElement;
+        const githubCheckbox = screen.getByTestId("source-checkbox-github") as HTMLInputElement;
 
-        expect(techBlogCheckbox.checked).toBe(true);
-        expect(devCommunityCheckbox.checked).toBe(false);
         expect(qiitaCheckbox.checked).toBe(true);
+        expect(hnCheckbox.checked).toBe(false);
+        expect(githubCheckbox.checked).toBe(true);
       });
     });
   });
@@ -291,7 +293,7 @@ describe("FilterPanel", () => {
     context("フィルタが選択されている場合", () => {
       it("クリアボタンが表示されること", () => {
         renderFilterPanel({
-          selectedSources: ["tech-blog"],
+          selectedSources: ["qiita"],
           selectedTags: ["React"],
           searchKeyword: "test",
         });
@@ -303,7 +305,7 @@ describe("FilterPanel", () => {
 
       it("クリアボタンをクリックするとすべてのフィルタがリセットされること", () => {
         renderFilterPanel({
-          selectedSources: ["tech-blog", "qiita"],
+          selectedSources: ["qiita", "github"],
           selectedTags: ["React", "TypeScript"],
           searchKeyword: "test",
         });
@@ -322,7 +324,7 @@ describe("FilterPanel", () => {
       it("アクティブフィルタ数が正しく表示されること", () => {
         // ソース2個 + タグ1個 + キーワード1個 = 4個
         renderFilterPanel({
-          selectedSources: ["tech-blog", "dev-community"],
+          selectedSources: ["qiita", "hackernews"],
           selectedTags: ["React"],
           searchKeyword: "test",
         });
@@ -334,7 +336,7 @@ describe("FilterPanel", () => {
       it("キーワードが空白のみの場合はカウントされないこと", () => {
         // ソース1個 + タグ1個 = 2個（空白のみのキーワードはカウントされない）
         renderFilterPanel({
-          selectedSources: ["tech-blog"],
+          selectedSources: ["qiita"],
           selectedTags: ["React"],
           searchKeyword: "   ",
         });
@@ -363,9 +365,9 @@ describe("FilterPanel", () => {
         const { rerender } = renderFilterPanel();
 
         // 1. ソースを選択
-        fireEvent.click(screen.getByTestId("source-checkbox-tech-blog"));
+        fireEvent.click(screen.getByTestId("source-checkbox-qiita"));
         expect(mockOnFiltersChange).toHaveBeenLastCalledWith({
-          selectedSources: ["tech-blog"],
+          selectedSources: ["qiita"],
           selectedTags: [],
           searchKeyword: "",
         });
@@ -375,13 +377,13 @@ describe("FilterPanel", () => {
           <FilterPanel
             availableSources={mockAvailableSources}
             availableTags={mockAvailableTags}
-            filters={{ selectedSources: ["tech-blog"], selectedTags: [], searchKeyword: "" }}
+            filters={{ selectedSources: ["qiita"], selectedTags: [], searchKeyword: "" }}
             onFiltersChange={mockOnFiltersChange}
           />
         );
         fireEvent.click(screen.getByTestId("tag-chip-React"));
         expect(mockOnFiltersChange).toHaveBeenLastCalledWith({
-          selectedSources: ["tech-blog"],
+          selectedSources: ["qiita"],
           selectedTags: ["React"],
           searchKeyword: "",
         });
@@ -391,7 +393,7 @@ describe("FilterPanel", () => {
           <FilterPanel
             availableSources={mockAvailableSources}
             availableTags={mockAvailableTags}
-            filters={{ selectedSources: ["tech-blog"], selectedTags: ["React"], searchKeyword: "" }}
+            filters={{ selectedSources: ["qiita"], selectedTags: ["React"], searchKeyword: "" }}
             onFiltersChange={mockOnFiltersChange}
           />
         );
@@ -399,7 +401,7 @@ describe("FilterPanel", () => {
           target: { value: "hooks" },
         });
         expect(mockOnFiltersChange).toHaveBeenLastCalledWith({
-          selectedSources: ["tech-blog"],
+          selectedSources: ["qiita"],
           selectedTags: ["React"],
           searchKeyword: "hooks",
         });

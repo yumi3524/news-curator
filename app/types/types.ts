@@ -1,14 +1,11 @@
 /**
- * 記事ソース情報
+ * データソース型（型安全なリテラル型）
  */
-export interface ArticleSource {
-  id: string;
-  name: string;
-}
+export type Source = 'qiita' | 'hackernews' | 'github';
 
 /**
  * 記事データ構造
- * 将来のAPI統合を考慮した設計
+ * 3つのAPI（Qiita/HN/GitHub）を統一的に扱う共通型
  */
 export interface Article {
   id: string;
@@ -16,27 +13,49 @@ export interface Article {
   description: string;
   url: string;
   publishedAt: string;
-  source: ArticleSource;
+  source: Source;
   author?: string;
   tags: string[];
+
+  // 翻訳（Hacker News用）
+  titleJa?: string;
+  descriptionJa?: string;
+  isTranslated?: boolean;
+
+  // 読了時間（分）
+  readingTimeMinutes?: number;
+
+  // Qiita固有
+  likesCount?: number;
+  stocksCount?: number;
+
+  // Hacker News固有
+  score?: number;
+  commentsCount?: number;
+
+  // GitHub固有
+  stars?: number;
+  forks?: number;
+  language?: string;
+
+  // UI状態（クライアント側で付与）
+  isFavorite?: boolean;
   imageUrl?: string;
-  likesCount?: number; // いいね数
-  stocksCount?: number; // ストック数
-  isFavorite?: boolean; // お気に入り状態（フィード機能用）
 }
 
 /**
- * API レスポンス構造（将来の使用を想定）
+ * API レスポンス構造
  */
 export interface ArticlesResponse {
   articles: Article[];
   totalResults: number;
   page?: number;
   pageSize?: number;
+  fetchedAt?: string; // キャッシュ時刻
 }
 
 /**
- * タグまたはソースのカウント情報
+ * タグのカウント情報
  */
 export interface TagCount {
   name: string;
@@ -47,10 +66,71 @@ export interface TagCount {
  * フィルタ条件の型定義
  */
 export interface FilterOptions {
-  /** 選択されたソースID（複数選択可能） */
-  selectedSources: string[];
+  /** 選択されたソース（複数選択可能） */
+  selectedSources: Source[];
   /** 選択されたタグ（複数選択可能） */
   selectedTags: string[];
   /** キーワード検索文字列 */
   searchKeyword: string;
 }
+
+// ========================================
+// ユーザーデータ型
+// ========================================
+
+/**
+ * 既読記事
+ */
+export interface ReadArticle {
+  articleId: string;
+  source: Source;
+  readAt: string; // ISO 8601
+}
+
+/**
+ * ブックマーク
+ */
+export interface Bookmark {
+  articleId: string;
+  source: Source;
+  savedAt: string; // ISO 8601
+  article: Article; // オフライン表示用にスナップショット保存
+}
+
+/**
+ * 学習統計
+ */
+export interface UserStats {
+  totalRead: number;
+  readBySource: Record<Source, number>;
+  streak: number; // 連続学習日数
+  lastReadDate: string; // YYYY-MM-DD
+  weeklyHistory: number[]; // 過去7日の読了数 [今日, 1日前, 2日前, ...]
+}
+
+/**
+ * ユーザー設定
+ */
+export interface UserPreferences {
+  theme: 'light' | 'dark' | 'system';
+  autoTranslate: boolean; // HN記事の自動翻訳
+  defaultTab: Source | 'all';
+}
+
+// ========================================
+// ストレージキー定数
+// ========================================
+
+export const USER_STORAGE_KEYS = {
+  READ_ARTICLES: 'user:readArticles',
+  BOOKMARKS: 'user:bookmarks',
+  STATS: 'user:stats',
+  PREFERENCES: 'user:preferences',
+} as const;
+
+export const CACHE_KEYS = {
+  QIITA_ARTICLES: 'cache:qiita',
+  HN_ARTICLES: 'cache:hackernews',
+  GITHUB_ARTICLES: 'cache:github',
+  LAST_FETCH: 'cache:lastFetch',
+} as const;

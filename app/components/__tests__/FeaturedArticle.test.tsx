@@ -9,7 +9,7 @@ const mockArticle: Article = {
   description: 'これはテスト記事の説明文です。',
   url: 'https://example.com/article',
   publishedAt: '2024-01-01T00:00:00Z',
-  source: { id: 'test-source', name: 'Test Source' },
+  source: 'qiita',
   tags: ['TypeScript', 'React'],
   likesCount: 10,
   stocksCount: 5,

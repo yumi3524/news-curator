@@ -24,15 +24,16 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const baseArticle = {
+import type { Article } from '../types/types';
+
+const baseArticle: Article = {
   id: '1',
   title: 'React 19の新機能と破壊的変更の完全ガイド',
   description: 'React 19で導入される新機能について解説します',
   url: 'https://example.com/article/1',
   publishedAt: '2024-11-20T10:00:00Z',
-  source: { id: 'tech-blog', name: 'Tech Blog' },
+  source: 'qiita',
   tags: ['React', 'JavaScript', 'Frontend'],
-  isFavorite: false,
   likesCount: 42,
   stocksCount: 15,
 };
