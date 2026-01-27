@@ -42,3 +42,23 @@ next-env.d.ts
 
 *storybook.log
 storybook-static
+
+# AI assistant configuration
+/.agent
+/rules
+/CLAUDE.md
+
+# Development process documents
+/docs/mvp-implementation-plan.md
+/docs/testing-strategy.md
+/docs/external-sources.md
+/docs/DARK_MODE_TEXT_COLOR_FIX.md
+/TODO.md
+/feedback/
+/news-curator-light-dark-mode.html
+
+/qiita
+
+.claude/**/CLAUDE.md
+figma-export/
+

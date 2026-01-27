@@ -1,7 +1,26 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import type { Article } from '@/app/types/types';
 
 const FAVORITES_STORAGE_KEY = 'user:favorites';
+
+/** LocalStorageから初期値を取得 */
+function getInitialFavorites(): Map<string, Article> {
+  if (typeof window === 'undefined') return new Map();
+  try {
+    const saved = localStorage.getItem(FAVORITES_STORAGE_KEY);
+    if (saved) {
+      const parsed: Article[] = JSON.parse(saved);
+      const map = new Map<string, Article>();
+      parsed.forEach((article) => {
+        map.set(article.id, article);
+      });
+      return map;
+    }
+  } catch (e) {
+    console.error('お気に入りの読み込みエラー:', e);
+  }
+  return new Map();
+}
 
 /** お気に入り記事のIDセットを管理 */
 export interface UseFavoritesReturn {
@@ -27,26 +46,7 @@ export interface UseFavoritesReturn {
  * LocalStorageに記事データを保存し、永続化します。
  */
 export function useFavorites(): UseFavoritesReturn {
-  const [favorites, setFavorites] = useState<Map<string, Article>>(new Map());
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  // LocalStorageから読み込み
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(FAVORITES_STORAGE_KEY);
-      if (saved) {
-        const parsed: Article[] = JSON.parse(saved);
-        const map = new Map<string, Article>();
-        parsed.forEach((article) => {
-          map.set(article.id, article);
-        });
-        setFavorites(map);
-      }
-    } catch (e) {
-      console.error('お気に入りの読み込みエラー:', e);
-    }
-    setIsLoaded(true);
-  }, []);
+  const [favorites, setFavorites] = useState<Map<string, Article>>(getInitialFavorites);
 
   // LocalStorageに保存
   const saveFavorites = useCallback((map: Map<string, Article>) => {
