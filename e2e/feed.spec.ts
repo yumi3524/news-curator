@@ -43,9 +43,9 @@ test.describe("フィードページ", () => {
     const themeButton = page.getByRole("button", { name: "ダークモードに切り替え" });
     await expect(themeButton).toBeVisible();
 
-    // htmlタグにdarkクラスがないことを確認
+    // htmlタグにlightクラスがあることを確認（ライトモード = lightクラスあり）
     const html = page.locator('html');
-    await expect(html).not.toHaveClass(/dark/);
+    await expect(html).toHaveClass(/light/);
 
     // ダークモードに切り替え
     await themeButton.click();
@@ -53,12 +53,12 @@ test.describe("フィードページ", () => {
     // ボタンのAccessible Nameが変わることを確認
     await expect(page.getByRole("button", { name: "ライトモードに切り替え" })).toBeVisible();
 
-    // htmlタグにdarkクラスが付与されることを確認
-    await expect(html).toHaveClass(/dark/);
+    // htmlタグからlightクラスが削除されることを確認（ダークモード = lightクラスなし）
+    await expect(html).not.toHaveClass(/light/);
 
     // リロードしても設定が維持されること（localStorage）
     await page.reload();
-    await expect(html).toHaveClass(/dark/);
+    await expect(html).not.toHaveClass(/light/);
     await expect(page.getByRole("button", { name: "ライトモードに切り替え" })).toBeVisible();
   });
 
