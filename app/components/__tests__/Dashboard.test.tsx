@@ -2,11 +2,12 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Dashboard } from '../Dashboard';
+import type { Article } from '@/app/types/types';
 
 const context = describe;
 
-// フェッチのモック
-const mockArticles = [
+// お気に入り記事のモック
+const mockFavoriteArticles: Article[] = [
   {
     id: '1',
     title: 'React 19の新機能',
@@ -16,6 +17,7 @@ const mockArticles = [
     source: 'qiita',
     tags: ['React'],
     likesCount: 100,
+    isFavorite: true,
   },
   {
     id: '2',
@@ -26,6 +28,7 @@ const mockArticles = [
     source: 'hackernews',
     tags: ['Rust'],
     score: 200,
+    isFavorite: true,
   },
   {
     id: '3',
@@ -36,15 +39,32 @@ const mockArticles = [
     source: 'github',
     tags: ['Next.js'],
     stars: 1000,
+    isFavorite: true,
   },
 ];
+
+// LocalStorageのモック
+const localStorageMock = {
+  store: {} as Record<string, string>,
+  getItem: vi.fn((key: string) => localStorageMock.store[key] ?? null),
+  setItem: vi.fn((key: string, value: string) => {
+    localStorageMock.store[key] = value;
+  }),
+  removeItem: vi.fn((key: string) => {
+    delete localStorageMock.store[key];
+  }),
+  clear: vi.fn(() => {
+    localStorageMock.store = {};
+  }),
+};
 
 describe('Dashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    global.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ articles: mockArticles }),
+    localStorageMock.store = {};
+    Object.defineProperty(window, 'localStorage', {
+      value: localStorageMock,
+      writable: true,
     });
   });
 
@@ -99,11 +119,10 @@ describe('Dashboard', () => {
         expect(screen.getByText('186分')).toBeInTheDocument();
       });
 
-      it('週間目標の進捗が表示されること', async () => {
+      it('お気に入り数が表示されること', async () => {
         render(<Dashboard />);
 
-        expect(screen.getByText('週間目標')).toBeInTheDocument();
-        expect(screen.getByText('15/20')).toBeInTheDocument();
+        expect(screen.getByText('お気に入り')).toBeInTheDocument();
       });
 
       it('連続日数が表示されること', async () => {
@@ -118,27 +137,34 @@ describe('Dashboard', () => {
   });
 
   describe('お気に入り記事', () => {
-    context('記事が読み込まれた場合', () => {
+    context('お気に入りがない場合', () => {
       it('お気に入り記事セクションが表示されること', async () => {
         render(<Dashboard />);
 
-        await waitFor(() => {
-          expect(screen.getByText('お気に入り記事')).toBeInTheDocument();
-        });
+        expect(screen.getByText('お気に入り記事')).toBeInTheDocument();
+      });
+
+      it('空の状態メッセージが表示されること', async () => {
+        render(<Dashboard />);
+
+        expect(screen.getByText('お気に入り記事がありません')).toBeInTheDocument();
+      });
+    });
+
+    context('お気に入りがある場合', () => {
+      beforeEach(() => {
+        // LocalStorageにお気に入りをセット（キーはuser:favorites）
+        localStorageMock.store['user:favorites'] = JSON.stringify(mockFavoriteArticles);
       });
 
       it('記事カードが表示されること', async () => {
         render(<Dashboard />);
 
         await waitFor(() => {
-          expect(screen.getAllByTestId('article-card').length).toBeGreaterThan(
-            0
-          );
+          expect(screen.getAllByTestId('article-card').length).toBe(3);
         });
       });
-    });
 
-    context('ソースタブでフィルタリングする場合', () => {
       it('すべてタブをクリックすると全記事が表示されること', async () => {
         const user = userEvent.setup();
         render(<Dashboard />);
@@ -171,20 +197,4 @@ describe('Dashboard', () => {
     });
   });
 
-  describe('エラーハンドリング', () => {
-    context('API呼び出しが失敗した場合', () => {
-      it('エラーがコンソールに出力されること', async () => {
-        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-        global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
-
-        render(<Dashboard />);
-
-        await waitFor(() => {
-          expect(consoleSpy).toHaveBeenCalled();
-        });
-
-        consoleSpy.mockRestore();
-      });
-    });
-  });
 });

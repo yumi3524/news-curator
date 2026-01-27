@@ -37,8 +37,8 @@ describe('ThemeSwitcher', () => {
 
     render(<ThemeSwitcher />);
 
-    // ダークモードになるべき
-    expect(document.documentElement.classList.contains('dark')).toBe(true);
+    // ダークモード = lightクラスなし
+    expect(document.documentElement.classList.contains('light')).toBe(false);
     expect(screen.getByRole('button', { name: 'ライトモードに切り替え' })).toBeInTheDocument();
   });
 
@@ -95,13 +95,13 @@ describe('ThemeSwitcher', () => {
     // ダークモードに切り替え
     fireEvent.click(button);
     expect(screen.getByRole('button', { name: 'ライトモードに切り替え' })).toBeInTheDocument();
-    expect(document.documentElement.classList.contains('dark')).toBe(true);
+    expect(document.documentElement.classList.contains('light')).toBe(false);
     expect(localStorage.getItem('darkMode')).toBe('true');
 
     // ライトモードに戻す
     fireEvent.click(button);
     expect(screen.getByRole('button', { name: 'ダークモードに切り替え' })).toBeInTheDocument();
-    expect(document.documentElement.classList.contains('dark')).toBe(false);
+    expect(document.documentElement.classList.contains('light')).toBe(true);
     expect(localStorage.getItem('darkMode')).toBe('false');
   });
 });

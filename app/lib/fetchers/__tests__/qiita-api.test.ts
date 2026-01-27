@@ -47,7 +47,7 @@ describe('QiitaAPIFetcher', () => {
       description: 'This is a test article....',
       url: 'https://qiita.com/test',
       publishedAt: '2023-01-01T00:00:00Z',
-      source: { id: 'qiita', name: 'Qiita' },
+      source: 'qiita',
       author: 'testuser',
       tags: ['React', 'TypeScript'],
       imageUrl: 'https://example.com/avatar.png',
