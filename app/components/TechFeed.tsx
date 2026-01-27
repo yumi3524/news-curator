@@ -11,6 +11,8 @@ import { EmptyState } from './EmptyState';
 import { ErrorState } from './ErrorState';
 import { PersonalSearchModal } from './PersonalSearchModal';
 import { getFeaturedArticle, sortByScore } from '@/app/lib/scoring';
+import { useFavorites } from '@/app/lib/hooks/useFavorites';
+import { useTranslation } from '@/app/lib/hooks/useTranslation';
 
 export function TechFeed() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -23,38 +25,42 @@ export function TechFeed() {
 
   // パーソナルサーチの状態
   const [isPersonalSearchOpen, setIsPersonalSearchOpen] = useState(false);
-  const [isPersonalSearchMode, setIsPersonalSearchMode] = useState(false); // パーソナルサーチで記事取得中か
-  const [personalSearchTags, setPersonalSearchTags] = useState<string[]>([]);
+
+  // お気に入り機能
+  const { isFavorite, toggleFavorite } = useFavorites();
+
+  // 翻訳機能
+  const { translateArticles, isTranslating } = useTranslation();
 
 
-  // LocalStorageからパーソナルサーチの設定を復元
-  useEffect(() => {
-    const saved = localStorage.getItem('personal-search-tags');
-    if (saved) {
+
+  /**
+   * 記事を取得して翻訳を適用する共通処理
+   */
+  const fetchAndTranslateArticles = useCallback(
+    async (url: string) => {
+      setIsLoading(true);
+      setError(null);
       try {
-        const tags = JSON.parse(saved);
-        setPersonalSearchTags(tags);
-      } catch (e) {
-        console.error('パーソナルサーチの設定読み込みエラー:', e);
-      }
-    }
-  }, []);
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('記事の取得に失敗しました');
+        const data = await response.json();
 
-  const fetchArticles = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch('/api/articles');
-      if (!response.ok) throw new Error('記事の取得に失敗しました');
-      const data = await response.json();
-      setArticles(data.articles || []);
-      setIsPersonalSearchMode(false); // 初期読み込み時は通常モード
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'エラーが発生しました');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+        // HackerNews記事を自動翻訳
+        const translatedArticles = await translateArticles(data.articles || []);
+        setArticles(translatedArticles);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'エラーが発生しました');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [translateArticles]
+  );
+
+  const fetchArticles = useCallback(() => {
+    return fetchAndTranslateArticles('/api/articles');
+  }, [fetchAndTranslateArticles]);
 
   useEffect(() => {
     fetchArticles();
@@ -132,27 +138,17 @@ export function TechFeed() {
   };
 
   // パーソナルサーチハンドラ
-  const handlePersonalSearch = async (tags: string[]) => {
-    setIsLoading(true);
-    setError(null);
-    try {
+  const handlePersonalSearch = useCallback(
+    async (searchTags: string[]) => {
       // 選択したタグをLocalStorageに保存
-      localStorage.setItem('personal-search-tags', JSON.stringify(tags));
-      setPersonalSearchTags(tags);
+      localStorage.setItem('personal-search-tags', JSON.stringify(searchTags));
 
       // 複数タグでAPI呼び出し
-      const tagsQuery = tags.join(',');
-      const response = await fetch(`/api/articles?tags=${encodeURIComponent(tagsQuery)}`);
-      if (!response.ok) throw new Error('記事の取得に失敗しました');
-      const data = await response.json();
-      setArticles(data.articles || []);
-      setIsPersonalSearchMode(true);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'エラーが発生しました');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      const tagsQuery = searchTags.join(',');
+      await fetchAndTranslateArticles(`/api/articles?tags=${encodeURIComponent(tagsQuery)}`);
+    },
+    [fetchAndTranslateArticles]
+  );
 
   // スコアリングで注目記事を選定
   const featuredArticle = useMemo(() => getFeaturedArticle(filteredArticles), [filteredArticles]);
@@ -181,7 +177,7 @@ export function TechFeed() {
           onPersonalSearchClick={() => setIsPersonalSearchOpen(true)}
         />
 
-        {isLoading ? (
+        {isLoading || isTranslating ? (
           <LoadingState />
         ) : error ? (
           <ErrorState message={error} />
@@ -189,10 +185,20 @@ export function TechFeed() {
           <EmptyState />
         ) : (
           <>
-            {featuredArticle && <FeaturedArticle article={featuredArticle} onTagClick={handleTagToggle} />}
+            {featuredArticle && (
+              <FeaturedArticle
+                article={{ ...featuredArticle, isFavorite: isFavorite(featuredArticle.id) }}
+                onTagClick={handleTagToggle}
+              />
+            )}
             <div className="grid animate-[fadeIn_0.5s_ease-out_0.3s_both] grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
               {regularArticles.map((article) => (
-                <ArticleCard key={article.id} article={article} onTagClick={handleTagToggle} />
+                <ArticleCard
+                  key={article.id}
+                  article={{ ...article, isFavorite: isFavorite(article.id) }}
+                  onTagClick={handleTagToggle}
+                  onToggleFavorite={() => toggleFavorite(article)}
+                />
               ))}
             </div>
           </>

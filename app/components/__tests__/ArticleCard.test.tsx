@@ -11,7 +11,7 @@ const createMockArticle = (overrides: Partial<Article> = {}): Article => ({
   description: 'React 19で導入される新機能について解説します',
   url: 'https://example.com/article/1',
   publishedAt: '2024-11-20T10:00:00Z',
-  source: { id: 'tech-blog', name: 'Tech Blog' },
+  source: 'qiita',
   author: '山田太郎',
   tags: ['React', 'JavaScript', 'Frontend'],
   isFavorite: false,
@@ -53,7 +53,7 @@ describe('ArticleCard', () => {
       it('ソース名が表示されること', () => {
         renderArticleCard();
         const meta = screen.getByTestId('article-meta');
-        expect(meta).toHaveTextContent('Tech Blog');
+        expect(meta).toHaveTextContent('Qiita');
       });
     });
   });

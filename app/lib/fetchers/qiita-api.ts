@@ -126,10 +126,7 @@ export class QiitaAPIFetcher implements ArticleFetcher {
       description: this.extractDescription(item.body),
       url: item.url,
       publishedAt: item.created_at,
-      source: {
-        id: "qiita",
-        name: "Qiita",
-      },
+      source: 'qiita',
       author: item.user?.id || "Unknown",
       tags: item.tags.map((t) => t.name),
       imageUrl: item.user?.profile_image_url,

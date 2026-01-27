@@ -4,7 +4,8 @@ import { Sun, Moon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export function ThemeSwitcher() {
-  const [isDark, setIsDark] = useState(false);
+  // デフォルトはダークモード（CSSのデフォルト）
+  const [isDark, setIsDark] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -24,13 +25,15 @@ export function ThemeSwitcher() {
     }
 
     setIsDark(darkMode);
-    document.documentElement.classList.toggle('dark', darkMode);
+    // ライトモードの場合は .light クラスを追加（デフォルトはダーク）
+    document.documentElement.classList.toggle('light', !darkMode);
   }, []);
 
   const toggleTheme = () => {
     const newMode = !isDark;
     setIsDark(newMode);
-    document.documentElement.classList.toggle('dark', newMode);
+    // ライトモードの場合は .light クラスを追加
+    document.documentElement.classList.toggle('light', !newMode);
     localStorage.setItem('darkMode', String(newMode));
   };
 

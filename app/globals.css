@@ -1,12 +1,119 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Typography */
+  --font-sans: 'DM Sans', 'Noto Sans JP', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Font sizes */
+  --font-size-xs: 11px;
+  --font-size-sm: 13px;
+  --font-size-base: 15px;
+  --font-size-lg: 17px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 32px;
+
+  /* Border radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.3);
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s ease;
+  --transition-smooth: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Source colors */
+  --color-qiita: #6EBF8B;
+  --color-hackernews: #E88B5A;
+  --color-github: #B19CD9;
+
+  /* Semantic colors */
+  --color-success: #6EBF8B;
+  --color-warning: #E8A954;
+  --color-error: #E85A5A;
+  --color-info: #6B9FD4;
 }
 
-/* Light Mode Colors (Amber Original) */
+/* ==============================================
+   Refined Tech Design System - Dark Mode First
+   ============================================== */
+
+/* Dark Mode (Default - Refined Tech) */
 :root {
+  /* Background layers */
+  --color-bg-base: #0D0F12;
+  --color-bg-elevated: #161A1F;
+  --color-bg-card: #1C2127;
+  --color-bg-card-hover: #242A32;
+  --color-bg-input: #12151A;
+
+  /* Text hierarchy */
+  --color-text-primary: #F4F5F6;
+  --color-text-secondary: #9BA3AF;
+  --color-text-tertiary: #5C6370;
+  --color-text-inverse: #0D0F12;
+
+  /* Brand accent - Warm amber */
+  --color-accent-primary: #E8A954;
+  --color-accent-secondary: #C4873C;
+  --color-accent-glow: rgba(232, 169, 84, 0.15);
+  --color-accent-subtle: rgba(232, 169, 84, 0.08);
+
+  /* Borders & surfaces */
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border-hover: rgba(255, 255, 255, 0.12);
+  --color-border-active: rgba(255, 255, 255, 0.18);
+
+  /* Legacy mappings for compatibility */
+  --color-brand-primary: #E8A954;
+  --color-brand-secondary: #161A1F;
+  --color-brand-accent: #E8A954;
+  --color-accent-dark: #C4873C;
+  --color-bg-primary: #0D0F12;
+  --color-bg-secondary: #1C2127;
+  --color-bg-tertiary: #161A1F;
+  --color-text-on-accent: #0D0F12;
+  --color-featured-bg-start: #161A1F;
+  --color-featured-bg-end: #1C2127;
+  --color-featured-text: #F4F5F6;
+}
+
+/* Light Mode (Optional) */
+.light {
+  /* Background layers */
+  --color-bg-base: #F8FAFC;
+  --color-bg-elevated: #FFFFFF;
+  --color-bg-card: #FFFFFF;
+  --color-bg-card-hover: #F1F5F9;
+  --color-bg-input: #F1F5F9;
+
+  /* Text hierarchy */
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-tertiary: #94A3B8;
+  --color-text-inverse: #F4F5F6;
+
+  /* Brand accent */
+  --color-accent-primary: #D97706;
+  --color-accent-secondary: #B45309;
+  --color-accent-glow: rgba(217, 119, 6, 0.15);
+  --color-accent-subtle: rgba(217, 119, 6, 0.08);
+
+  /* Borders */
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-border-hover: rgba(0, 0, 0, 0.12);
+  --color-border-active: rgba(0, 0, 0, 0.18);
+
+  /* Legacy mappings */
   --color-brand-primary: #F59E0B;
   --color-brand-secondary: #1E293B;
   --color-brand-accent: #FBBF24;
@@ -14,32 +121,9 @@
   --color-bg-primary: #F8FAFC;
   --color-bg-secondary: #FFFFFF;
   --color-bg-tertiary: #FEF3C7;
-  --color-text-primary: #0F172A;
-  --color-text-secondary: #475569;
-  --color-text-tertiary: #94A3B8;
   --color-text-on-accent: #FFFFFF;
-  --color-border: #E2E8F0;
   --color-featured-bg-start: #1E293B;
   --color-featured-bg-end: #334155;
-  --color-featured-text: #FFFFFF;
-}
-
-/* Dark Mode Colors */
-.dark {
-  --color-brand-primary: #FDE68A;
-  --color-brand-secondary: #64748B;
-  --color-brand-accent: #FEF3C7;
-  --color-accent-dark: #FCD34D;
-  --color-bg-primary: #0F172A;
-  --color-bg-secondary: #1E293B;
-  --color-bg-tertiary: #334155;
-  --color-text-primary: #F1F5F9;
-  --color-text-secondary: #CBD5E1;
-  --color-text-tertiary: #94A3B8;
-  --color-text-on-accent: #0F172A;
-  --color-border: #334155;
-  --color-featured-bg-start: #334155;
-  --color-featured-bg-end: #475569;
   --color-featured-text: #FFFFFF;
 }
 

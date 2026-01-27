@@ -1,8 +1,10 @@
 'use client';
 
-import { Heart, Bookmark } from 'lucide-react';
+import { useState } from 'react';
+import { Heart, Bookmark, Clock, MessageCircle, Star, GitFork, Languages } from 'lucide-react';
 import type { Article } from '../types/types';
 import { MAX_TAGS_TO_DISPLAY_MOBILE } from '../lib/constants';
+import { SOURCE_DISPLAY_NAMES, SOURCE_COLOR_VARS } from '../lib/constants/source';
 import { useTagClickHandler } from '../lib/hooks/useTagClickHandler';
 import { Tag } from './Tag';
 import { Badge } from './Badge';
@@ -12,10 +14,25 @@ interface ArticleCardProps {
   onTagClick?: (tag: string) => void;
   /** お気に入り切り替えハンドラ（オプション：指定時のみお気に入りボタン表示） */
   onToggleFavorite?: (articleId: string) => void;
+  /** 翻訳表示の初期状態（デフォルト: true = 翻訳表示） */
+  showTranslatedDefault?: boolean;
 }
 
-export function ArticleCard({ article, onTagClick, onToggleFavorite }: ArticleCardProps) {
+export function ArticleCard({
+  article,
+  onTagClick,
+  onToggleFavorite,
+  showTranslatedDefault = true,
+}: ArticleCardProps) {
   const handleTagClick = useTagClickHandler(onTagClick);
+  const sourceColor = SOURCE_COLOR_VARS[article.source];
+
+  // 翻訳表示の切り替え状態
+  const [showTranslated, setShowTranslated] = useState(showTranslatedDefault);
+
+  // 表示するタイトル・説明を決定
+  const displayTitle = showTranslated && article.titleJa ? article.titleJa : article.title;
+  const displayDescription = showTranslated && article.descriptionJa ? article.descriptionJa : article.description;
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -27,88 +44,194 @@ export function ArticleCard({ article, onTagClick, onToggleFavorite }: ArticleCa
   const visibleTags = article.tags.slice(0, MAX_TAGS_TO_DISPLAY_MOBILE);
   const remainingCount = article.tags.length - MAX_TAGS_TO_DISPLAY_MOBILE;
 
-  return (
-    <div className="group relative">
-      {/* お気に入りボタン（onToggleFavorite が渡された場合のみ表示） */}
-      {onToggleFavorite && (
-        <button
-          onClick={handleFavoriteClick}
-          className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-bg-secondary)]/90 backdrop-blur-sm transition-all duration-200 hover:scale-110"
-          aria-label={article.isFavorite ? 'お気に入りから削除' : 'お気に入りに追加'}
-          data-testid="favorite-button"
-        >
-          <Heart
-            className={`h-5 w-5 transition-colors ${
-              article.isFavorite
-                ? 'fill-red-500 text-red-500'
-                : 'text-[var(--color-text-tertiary)] group-hover:text-[var(--color-text-secondary)]'
-            }`}
-          />
-        </button>
-      )}
-
-      <a
-        href={article.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex h-full flex-col rounded-[10px] border-[1.5px] border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 shadow-[0_1px_3px_rgba(0,0,0,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-[var(--color-brand-primary)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.08)]"
-        data-testid="article-card"
-      >
-        {/* Tags - モバイル: 横スクロール, デスクトップ: 折り返し */}
-        <div
-          className="mb-3.5 flex min-h-[28px] gap-1.5 overflow-x-auto flex-nowrap md:flex-wrap md:overflow-x-visible scrollbar-hide"
-          data-testid="article-tags"
-        >
-          {visibleTags.map((tag) => (
-            <Tag
-              key={tag}
-              label={tag}
-              variant="default"
-              size="sm"
-              onClick={(e) => handleTagClick(e, tag)}
-              aria-label={`${tag}でフィルタリング`}
-            />
-          ))}
-          {remainingCount > 0 && (
-            <Tag
-              label={`+${remainingCount}`}
-              variant="default"
-              size="sm"
-              isClickable={false}
-            />
-          )}
-        </div>
-
-        {/* Title */}
-        <h3
-          className="mb-3 min-h-[3.15rem] line-clamp-2 text-lg font-bold leading-[1.4] text-[var(--color-text-primary)]"
-          data-testid="article-title"
-        >
-          {article.title}
-        </h3>
-
-        {/* Summary */}
-        <p className="mb-4 flex-grow line-clamp-2 text-sm leading-[1.6] text-[var(--color-text-secondary)]">
-          {article.description}
-        </p>
-
-        {/* Footer */}
-        <div
-          className="mt-auto flex items-center justify-between border-t border-[var(--color-border)] pt-4"
-          data-testid="article-meta"
-        >
-          <div className="flex gap-4">
+  // ソース別のメトリクス表示
+  const renderMetrics = () => {
+    switch (article.source) {
+      case 'qiita':
+        return (
+          <>
             {article.likesCount !== undefined && (
               <Badge icon={<Heart className="h-3.5 w-3.5" />} label={article.likesCount} />
             )}
             {article.stocksCount !== undefined && (
               <Badge icon={<Bookmark className="h-3.5 w-3.5" />} label={article.stocksCount} />
             )}
+          </>
+        );
+      case 'hackernews':
+        return (
+          <>
+            {article.score !== undefined && (
+              <Badge icon={<Star className="h-3.5 w-3.5" />} label={article.score} />
+            )}
+            {article.commentsCount !== undefined && (
+              <Badge icon={<MessageCircle className="h-3.5 w-3.5" />} label={article.commentsCount} />
+            )}
+          </>
+        );
+      case 'github':
+        return (
+          <>
+            {article.stars !== undefined && (
+              <Badge icon={<Star className="h-3.5 w-3.5" />} label={article.stars} />
+            )}
+            {article.forks !== undefined && (
+              <Badge icon={<GitFork className="h-3.5 w-3.5" />} label={article.forks} />
+            )}
+          </>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="group relative">
+      <a
+        href={article.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="relative flex h-full flex-col overflow-hidden rounded-[14px] border border-[var(--color-border)] bg-[var(--color-bg-card)] p-6 transition-all duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-0.5 hover:border-[var(--color-border-hover)] hover:bg-[var(--color-bg-card-hover)]"
+        data-testid="article-card"
+        data-source={article.source}
+      >
+        {/* ソースカラーの左アクセントバー */}
+        <div
+          className="absolute left-0 top-6 bottom-6 w-[3px] rounded-r-sm opacity-60 transition-opacity duration-[250ms] group-hover:opacity-100"
+          style={{ background: sourceColor }}
+          aria-hidden="true"
+        />
+
+        {/* グロー効果（ホバー時） */}
+        <div
+          className="pointer-events-none absolute inset-0 rounded-[14px] opacity-0 transition-opacity duration-[350ms] group-hover:opacity-100"
+          style={{
+            background: `radial-gradient(ellipse 100% 100% at 50% 0%, ${sourceColor}15, transparent 70%)`,
+          }}
+          aria-hidden="true"
+        />
+
+        {/* Header: Tags + Reading time / Favorite */}
+        <div className="mb-4 flex items-start justify-between gap-3">
+          {/* Tags */}
+          <div
+            className="flex min-h-[24px] flex-wrap gap-2"
+            data-testid="article-tags"
+          >
+            {visibleTags.map((tag) => (
+              <Tag
+                key={tag}
+                label={tag}
+                variant="default"
+                size="sm"
+                onClick={(e) => handleTagClick(e, tag)}
+                aria-label={`${tag}でフィルタリング`}
+              />
+            ))}
+            {remainingCount > 0 && (
+              <Tag
+                label={`+${remainingCount}`}
+                variant="default"
+                size="sm"
+                isClickable={false}
+              />
+            )}
           </div>
 
-          <div className="text-xs font-semibold uppercase tracking-wide text-[var(--color-brand-primary)]">
-            {article.source.name}
+          {/* Reading time + Translated badge + Favorite button */}
+          <div className="flex items-center gap-2 shrink-0">
+            {article.isTranslated && (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowTranslated((prev) => !prev);
+                }}
+                className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold rounded-[6px] transition-colors hover:opacity-80"
+                style={{
+                  background: showTranslated
+                    ? 'rgba(232, 139, 90, 0.15)'
+                    : 'rgba(100, 100, 100, 0.15)',
+                  color: showTranslated
+                    ? 'var(--color-hackernews)'
+                    : 'var(--color-text-tertiary)',
+                  border: `1px solid ${
+                    showTranslated
+                      ? 'rgba(232, 139, 90, 0.25)'
+                      : 'rgba(100, 100, 100, 0.25)'
+                  }`,
+                }}
+                aria-label={showTranslated ? '原文を表示' : '翻訳を表示'}
+                data-testid="translation-toggle"
+              >
+                <Languages className="w-2.5 h-2.5" />
+                {showTranslated ? '翻訳' : '原文'}
+              </button>
+            )}
+            {article.readingTimeMinutes && (
+              <span
+                className="flex items-center gap-1 text-[11px] font-medium whitespace-nowrap"
+                style={{ color: 'var(--color-text-tertiary)' }}
+                data-testid="reading-time"
+              >
+                <Clock className="w-3 h-3 opacity-70" />
+                {article.readingTimeMinutes}分
+              </span>
+            )}
+            {/* お気に入りボタン（onToggleFavorite が渡された場合のみ表示） */}
+            {onToggleFavorite && (
+              <button
+                onClick={handleFavoriteClick}
+                className="flex h-7 w-7 items-center justify-center rounded-full transition-all duration-200 hover:scale-110 hover:bg-white/5"
+                aria-label={article.isFavorite ? 'お気に入りから削除' : 'お気に入りに追加'}
+                data-testid="favorite-button"
+              >
+                <Heart
+                  className={`h-4 w-4 transition-colors ${
+                    article.isFavorite
+                      ? 'fill-red-500 text-red-500'
+                      : 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]'
+                  }`}
+                />
+              </button>
+            )}
           </div>
+        </div>
+
+        {/* Title */}
+        <h3
+          className="mb-3 line-clamp-2 text-[17px] font-semibold leading-[1.45] tracking-[-0.01em] transition-colors duration-150 group-hover:text-[var(--color-accent-primary)]"
+          style={{ color: 'var(--color-text-primary)' }}
+          data-testid="article-title"
+        >
+          {displayTitle}
+        </h3>
+
+        {/* Description */}
+        <p
+          className="mb-5 flex-grow line-clamp-2 text-[13px] leading-[1.65]"
+          style={{ color: 'var(--color-text-secondary)' }}
+        >
+          {displayDescription}
+        </p>
+
+        {/* Footer */}
+        <div
+          className="mt-auto flex items-center justify-between border-t pt-4"
+          style={{ borderColor: 'var(--color-border)' }}
+          data-testid="article-meta"
+        >
+          <div className="flex gap-4">
+            {renderMetrics()}
+          </div>
+
+          <span
+            className="text-[10px] font-bold uppercase tracking-[0.1em] opacity-90"
+            style={{ color: sourceColor }}
+            data-testid="source-badge"
+          >
+            {SOURCE_DISPLAY_NAMES[article.source]}
+          </span>
         </div>
       </a>
     </div>

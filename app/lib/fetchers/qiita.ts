@@ -51,10 +51,7 @@ export class QiitaRSSFetcher implements ArticleFetcher {
             description: this.stripHTML(item.contentSnippet || item.content || ""),
             url: item.link || "",
             publishedAt: item.isoDate || item.pubDate || new Date().toISOString(),
-            source: {
-              id: "qiita",
-              name: "Qiita",
-            },
+            source: 'qiita',
             author: item.creator || item.author,
             tags: tags,
             imageUrl: undefined, // QiitaのRSSフィードには画像URLが含まれていない
