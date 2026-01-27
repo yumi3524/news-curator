@@ -11,6 +11,7 @@ import { EmptyState } from './EmptyState';
 import { ErrorState } from './ErrorState';
 import { PersonalSearchModal } from './PersonalSearchModal';
 import { getFeaturedArticle, sortByScore } from '@/app/lib/scoring';
+import { useFavorites } from '@/app/lib/hooks/useFavorites';
 
 export function TechFeed() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -25,6 +26,9 @@ export function TechFeed() {
   const [isPersonalSearchOpen, setIsPersonalSearchOpen] = useState(false);
   const [isPersonalSearchMode, setIsPersonalSearchMode] = useState(false); // パーソナルサーチで記事取得中か
   const [personalSearchTags, setPersonalSearchTags] = useState<string[]>([]);
+
+  // お気に入り機能
+  const { isFavorite, toggleFavorite } = useFavorites();
 
 
   // LocalStorageからパーソナルサーチの設定を復元
@@ -189,10 +193,20 @@ export function TechFeed() {
           <EmptyState />
         ) : (
           <>
-            {featuredArticle && <FeaturedArticle article={featuredArticle} onTagClick={handleTagToggle} />}
+            {featuredArticle && (
+              <FeaturedArticle
+                article={{ ...featuredArticle, isFavorite: isFavorite(featuredArticle.id) }}
+                onTagClick={handleTagToggle}
+              />
+            )}
             <div className="grid animate-[fadeIn_0.5s_ease-out_0.3s_both] grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
               {regularArticles.map((article) => (
-                <ArticleCard key={article.id} article={article} onTagClick={handleTagToggle} />
+                <ArticleCard
+                  key={article.id}
+                  article={{ ...article, isFavorite: isFavorite(article.id) }}
+                  onTagClick={handleTagToggle}
+                  onToggleFavorite={() => toggleFavorite(article)}
+                />
               ))}
             </div>
           </>

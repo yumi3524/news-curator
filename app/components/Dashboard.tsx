@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { BookOpen, Clock, Target, TrendingUp, Flame } from 'lucide-react';
+import { useState } from 'react';
+import { BookOpen, Clock, TrendingUp, Flame, Heart } from 'lucide-react';
 import { Header } from './Header';
 import { StatCard } from './StatCard';
 import { ProgressBar } from './ProgressBar';
 import { StreakBadge } from './StreakBadge';
 import { SourceTabs } from './SourceTabs';
 import { ArticleCard } from './ArticleCard';
-import { LoadingState } from './LoadingState';
-import type { Article, Source } from '../types/types';
+import type { Source } from '../types/types';
+import { useFavorites } from '../lib/hooks/useFavorites';
 
 /** ダッシュボード統計データ */
 interface DashboardStats {
@@ -43,51 +43,22 @@ const mockStats: DashboardStats = {
 export function Dashboard() {
   const [stats] = useState<DashboardStats>(mockStats);
   const [activeTab, setActiveTab] = useState<Source | 'all'>('all');
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  // お気に入り記事の取得（モック）
-  useEffect(() => {
-    const fetchFavorites = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch('/api/articles');
-        if (!response.ok) throw new Error('記事の取得に失敗しました');
-        const data = await response.json();
-        // モック: 最初の6件をお気に入りとして扱う
-        const favorites = (data.articles || []).slice(0, 6).map((a: Article) => ({
-          ...a,
-          isFavorite: true,
-        }));
-        setArticles(favorites);
-      } catch (err) {
-        console.error('お気に入り記事の取得エラー:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchFavorites();
-  }, []);
+  // お気に入り機能（LocalStorageから取得）
+  const { getFavoriteArticles, toggleFavorite, count: favoriteCount } = useFavorites();
+  const favoriteArticles = getFavoriteArticles();
 
   // ソースでフィルタリング
   const filteredArticles = activeTab === 'all'
-    ? articles
-    : articles.filter((a) => a.source === activeTab);
+    ? favoriteArticles
+    : favoriteArticles.filter((a) => a.source === activeTab);
 
   // ソース別カウント
   const sourceCounts = {
-    all: articles.length,
-    qiita: articles.filter((a) => a.source === 'qiita').length,
-    hackernews: articles.filter((a) => a.source === 'hackernews').length,
-    github: articles.filter((a) => a.source === 'github').length,
-  };
-
-  const handleToggleFavorite = (articleId: string) => {
-    setArticles((prev) =>
-      prev.map((a) =>
-        a.id === articleId ? { ...a, isFavorite: !a.isFavorite } : a
-      )
-    );
+    all: favoriteArticles.length,
+    qiita: favoriteArticles.filter((a) => a.source === 'qiita').length,
+    hackernews: favoriteArticles.filter((a) => a.source === 'hackernews').length,
+    github: favoriteArticles.filter((a) => a.source === 'github').length,
   };
 
   return (
@@ -135,9 +106,9 @@ export function Dashboard() {
               icon={<Clock className="w-5 h-5" />}
             />
             <StatCard
-              label="週間目標"
-              value={`${stats.weeklyProgress}/${stats.weeklyGoal}`}
-              icon={<Target className="w-5 h-5" />}
+              label="お気に入り"
+              value={favoriteCount}
+              icon={<Heart className="w-5 h-5" />}
             />
             <StatCard
               label="連続日数"
@@ -241,9 +212,7 @@ export function Dashboard() {
             />
           </div>
 
-          {isLoading ? (
-            <LoadingState />
-          ) : filteredArticles.length === 0 ? (
+          {filteredArticles.length === 0 ? (
             <div
               className="text-center py-12 rounded-[14px] border"
               style={{
@@ -251,8 +220,12 @@ export function Dashboard() {
                 borderColor: 'var(--color-border)',
               }}
             >
+              <Heart className="w-12 h-12 mx-auto mb-4 opacity-20" style={{ color: 'var(--color-text-tertiary)' }} />
               <p style={{ color: 'var(--color-text-tertiary)' }}>
                 お気に入り記事がありません
+              </p>
+              <p className="text-[12px] mt-2" style={{ color: 'var(--color-text-tertiary)' }}>
+                フィードでハートをクリックして記事を保存しましょう
               </p>
             </div>
           ) : (
@@ -266,7 +239,7 @@ export function Dashboard() {
                 <ArticleCard
                   key={article.id}
                   article={article}
-                  onToggleFavorite={handleToggleFavorite}
+                  onToggleFavorite={() => toggleFavorite(article)}
                 />
               ))}
             </div>
