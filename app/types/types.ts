@@ -133,4 +133,15 @@ export const CACHE_KEYS = {
   HN_ARTICLES: 'cache:hackernews',
   GITHUB_ARTICLES: 'cache:github',
   LAST_FETCH: 'cache:lastFetch',
+  TRANSLATION_PREFIX: 'cache:translation:', // translation:{articleId}
 } as const;
+
+/**
+ * 翻訳キャッシュデータ（Vercel KVに保存）
+ */
+export interface TranslationCache {
+  articleId: string;
+  titleJa: string;
+  descriptionJa: string;
+  translatedAt: string; // ISO 8601
+}

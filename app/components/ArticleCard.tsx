@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Heart, Bookmark, Clock, MessageCircle, Star, GitFork, Languages } from 'lucide-react';
 import type { Article } from '../types/types';
 import { MAX_TAGS_TO_DISPLAY_MOBILE } from '../lib/constants';
@@ -13,11 +14,25 @@ interface ArticleCardProps {
   onTagClick?: (tag: string) => void;
   /** お気に入り切り替えハンドラ（オプション：指定時のみお気に入りボタン表示） */
   onToggleFavorite?: (articleId: string) => void;
+  /** 翻訳表示の初期状態（デフォルト: true = 翻訳表示） */
+  showTranslatedDefault?: boolean;
 }
 
-export function ArticleCard({ article, onTagClick, onToggleFavorite }: ArticleCardProps) {
+export function ArticleCard({
+  article,
+  onTagClick,
+  onToggleFavorite,
+  showTranslatedDefault = true,
+}: ArticleCardProps) {
   const handleTagClick = useTagClickHandler(onTagClick);
   const sourceColor = SOURCE_COLOR_VARS[article.source];
+
+  // 翻訳表示の切り替え状態
+  const [showTranslated, setShowTranslated] = useState(showTranslatedDefault);
+
+  // 表示するタイトル・説明を決定
+  const displayTitle = showTranslated && article.titleJa ? article.titleJa : article.title;
+  const displayDescription = showTranslated && article.descriptionJa ? article.descriptionJa : article.description;
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -126,18 +141,32 @@ export function ArticleCard({ article, onTagClick, onToggleFavorite }: ArticleCa
           {/* Reading time + Translated badge + Favorite button */}
           <div className="flex items-center gap-2 shrink-0">
             {article.isTranslated && (
-              <span
-                className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold rounded-[6px]"
-                style={{
-                  background: 'rgba(232, 139, 90, 0.15)',
-                  color: 'var(--color-hackernews)',
-                  border: '1px solid rgba(232, 139, 90, 0.25)',
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowTranslated((prev) => !prev);
                 }}
-                data-testid="translated-badge"
+                className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold rounded-[6px] transition-colors hover:opacity-80"
+                style={{
+                  background: showTranslated
+                    ? 'rgba(232, 139, 90, 0.15)'
+                    : 'rgba(100, 100, 100, 0.15)',
+                  color: showTranslated
+                    ? 'var(--color-hackernews)'
+                    : 'var(--color-text-tertiary)',
+                  border: `1px solid ${
+                    showTranslated
+                      ? 'rgba(232, 139, 90, 0.25)'
+                      : 'rgba(100, 100, 100, 0.25)'
+                  }`,
+                }}
+                aria-label={showTranslated ? '原文を表示' : '翻訳を表示'}
+                data-testid="translation-toggle"
               >
                 <Languages className="w-2.5 h-2.5" />
-                翻訳
-              </span>
+                {showTranslated ? '翻訳' : '原文'}
+              </button>
             )}
             {article.readingTimeMinutes && (
               <span
@@ -175,7 +204,7 @@ export function ArticleCard({ article, onTagClick, onToggleFavorite }: ArticleCa
           style={{ color: 'var(--color-text-primary)' }}
           data-testid="article-title"
         >
-          {article.title}
+          {displayTitle}
         </h3>
 
         {/* Description */}
@@ -183,7 +212,7 @@ export function ArticleCard({ article, onTagClick, onToggleFavorite }: ArticleCa
           className="mb-5 flex-grow line-clamp-2 text-[13px] leading-[1.65]"
           style={{ color: 'var(--color-text-secondary)' }}
         >
-          {article.description}
+          {displayDescription}
         </p>
 
         {/* Footer */}

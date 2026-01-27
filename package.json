@@ -18,6 +18,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@upstash/redis": "^1.36.1",
+    "@vercel/kv": "^3.0.0",
     "lucide-react": "^0.468.0",
     "next": "16.1.0-canary.15",
     "react": "19.2.0",
@@ -51,7 +53,7 @@
     "storybook": "^10.0.8",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^3.2.4",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vitest": "^3.2.4"
   }
 }
