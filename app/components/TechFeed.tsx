@@ -10,9 +10,11 @@ import { LoadingState } from './LoadingState';
 import { EmptyState } from './EmptyState';
 import { ErrorState } from './ErrorState';
 import { PersonalSearchModal } from './PersonalSearchModal';
+import { CategorySelectionModal } from './CategorySelectionModal';
 import { getFeaturedArticle, sortByScore } from '@/app/lib/scoring';
 import { useFavorites } from '@/app/lib/hooks/useFavorites';
 import { useTranslation } from '@/app/lib/hooks/useTranslation';
+import { useCategories } from '@/app/lib/hooks/useCategories';
 
 export function TechFeed() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -26,11 +28,31 @@ export function TechFeed() {
   // パーソナルサーチの状態
   const [isPersonalSearchOpen, setIsPersonalSearchOpen] = useState(false);
 
+  // カテゴリ選択モーダルの状態
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+
   // お気に入り機能
   const { isFavorite, toggleFavorite } = useFavorites();
 
   // 翻訳機能
   const { translateArticles, isTranslating } = useTranslation();
+
+  // カテゴリ機能
+  const {
+    selectedCategories,
+    isOnboardingCompleted,
+    categoryTags,
+    selectCategories,
+    completeOnboarding,
+    hasSelectedCategories,
+  } = useCategories();
+
+  // 初回アクセス時にモーダル表示
+  useEffect(() => {
+    if (!isOnboardingCompleted) {
+      setIsCategoryModalOpen(true);
+    }
+  }, [isOnboardingCompleted]);
 
 
 
@@ -80,6 +102,13 @@ export function TechFeed() {
 
   const filteredArticles = useMemo(() => {
     return articles.filter((article) => {
+      // カテゴリフィルタ（OR条件）
+      if (hasSelectedCategories) {
+        const articleTagsLower = article.tags.map((t) => t.toLowerCase());
+        const matchesCategory = articleTagsLower.some((tag) => categoryTags.has(tag));
+        if (!matchesCategory) return false;
+      }
+
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         const matchesSearch =
@@ -99,7 +128,7 @@ export function TechFeed() {
 
       return true;
     });
-  }, [articles, searchQuery, selectedTags, filterMode]);
+  }, [articles, searchQuery, selectedTags, filterMode, categoryTags, hasSelectedCategories]);
 
   const activeFilters = useMemo(() => {
     const filters: Array<{ type: 'search' | 'tag'; value: string }> = [];
@@ -121,20 +150,15 @@ export function TechFeed() {
   };
 
   const handleRemoveFilter = (type: string, value: string) => {
-    const removeFromSet = (setter: React.Dispatch<React.SetStateAction<Set<string>>>) => {
-      setter((prev) => {
+    if (type === 'tag') {
+      setSelectedTags((prev) => {
         const next = new Set(prev);
         next.delete(value);
         return next;
       });
-    };
-
-    const handlers: Record<string, () => void> = {
-      tag: () => removeFromSet(setSelectedTags),
-      search: () => setSearchQuery(''),
-    };
-
-    handlers[type]?.();
+    } else if (type === 'search') {
+      setSearchQuery('');
+    }
   };
 
   // パーソナルサーチハンドラ
@@ -161,7 +185,10 @@ export function TechFeed() {
 
   return (
     <>
-      <Header />
+      <Header
+        selectedCategories={selectedCategories}
+        onCategoryClick={() => setIsCategoryModalOpen(true)}
+      />
 
       <main className="mx-auto max-w-[1400px] px-4 py-8 md:px-8">
         <FilterSection
@@ -210,6 +237,21 @@ export function TechFeed() {
           onClose={() => setIsPersonalSearchOpen(false)}
           availableTags={tags.map(t => t.name)}
           onSearch={handlePersonalSearch}
+        />
+
+        {/* カテゴリ選択モーダル */}
+        <CategorySelectionModal
+          isOpen={isCategoryModalOpen}
+          onClose={() => {
+            if (isOnboardingCompleted) setIsCategoryModalOpen(false);
+          }}
+          onComplete={(categories) => {
+            selectCategories(categories);
+            completeOnboarding();
+            setIsCategoryModalOpen(false);
+          }}
+          initialSelection={selectedCategories}
+          mode={isOnboardingCompleted ? 'settings' : 'onboarding'}
         />
       </main>
     </>
