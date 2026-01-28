@@ -59,20 +59,6 @@ const hnArticle: Article = {
   descriptionJa: 'メモリ安全性とパフォーマンスに焦点を当てた新しいシステムプログラミング言語です。',
 };
 
-/** GitHub記事 */
-const githubArticle: Article = {
-  id: '3',
-  title: 'vercel/next.js: The React Framework',
-  description: 'The React Framework for Production. Built on React, Next.js provides a best-in-class developer experience.',
-  url: 'https://github.com/vercel/next.js',
-  publishedAt: '2024-11-19T15:00:00Z',
-  source: 'github',
-  tags: ['Next.js', 'React', 'Framework'],
-  stars: 125000,
-  forks: 26500,
-  language: 'TypeScript',
-};
-
 /** デフォルト状態（Qiita） */
 export const Default: Story = {
   args: {
@@ -91,13 +77,6 @@ export const Qiita: Story = {
 export const HackerNews: Story = {
   args: {
     article: hnArticle,
-  },
-};
-
-/** GitHub記事 */
-export const GitHub: Story = {
-  args: {
-    article: githubArticle,
   },
 };
 
@@ -170,7 +149,6 @@ export const AllSources: Story = {
     <div className="flex flex-col gap-4 w-[400px]">
       <ArticleCard article={qiitaArticle} />
       <ArticleCard article={hnArticle} />
-      <ArticleCard article={githubArticle} />
     </div>
   ),
 };

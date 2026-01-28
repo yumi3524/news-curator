@@ -10,10 +10,21 @@ test.describe("フィードページ", () => {
   test.use({ colorScheme: 'light' });
 
   test.beforeEach(async ({ page }) => {
-    // ローカルストレージをクリアするために一度アクセス
+    // ローカルストレージをクリアしてからアクセス
     await page.goto("/");
     await page.evaluate(() => localStorage.clear());
     await page.reload();
+
+    // カテゴリ選択モーダルが表示されたらスキップ
+    try {
+      const skipButton = page.getByRole("button", { name: "スキップ" });
+      await skipButton.waitFor({ state: "visible", timeout: 3000 });
+      await skipButton.click();
+      // モーダルが閉じるのを待つ
+      await skipButton.waitFor({ state: "hidden", timeout: 2000 });
+    } catch {
+      // モーダルが表示されない場合は継続
+    }
   });
 
   test("displays the main title", async ({ page }) => {
@@ -64,7 +75,7 @@ test.describe("フィードページ", () => {
 
   test("記事一覧が表示されること", async ({ page }) => {
     // タイムアウトを少し長めに
-    test.setTimeout(10000);
+    test.setTimeout(30000);
 
     // 記事コンテナが表示されるのを待つ
     const main = page.locator('main');

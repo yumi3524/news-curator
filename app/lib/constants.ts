@@ -5,7 +5,6 @@
 // API関連
 export const QIITA_API_BASE_URL = "https://qiita.com/api/v2";
 export const HN_API_BASE_URL = "https://hacker-news.firebaseio.com/v0";
-export const GITHUB_API_BASE_URL = "https://api.github.com";
 export const CACHE_REVALIDATE_SECONDS = 300; // 5分
 
 // 記事取得設定

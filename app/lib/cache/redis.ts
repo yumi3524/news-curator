@@ -115,8 +115,6 @@ export function getSourceCacheKey(source: Source | 'all'): string {
       return 'cache:articles:qiita';
     case 'hackernews':
       return 'cache:articles:hackernews';
-    case 'github':
-      return 'cache:articles:github';
     case 'all':
     default:
       return 'cache:articles:all';

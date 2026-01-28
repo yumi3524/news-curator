@@ -19,7 +19,6 @@ describe("SourceTabs", () => {
         expect(screen.getByRole("tab", { name: /すべて/i })).toBeInTheDocument();
         expect(screen.getByRole("tab", { name: /Qiita/i })).toBeInTheDocument();
         expect(screen.getByRole("tab", { name: /HN/i })).toBeInTheDocument();
-        expect(screen.getByRole("tab", { name: /GitHub/i })).toBeInTheDocument();
       });
 
       it("tablistロールが設定されていること", () => {
@@ -52,18 +51,16 @@ describe("SourceTabs", () => {
             activeTab="all"
             onTabChange={mockOnTabChange}
             counts={{
-              all: 42,
+              all: 33,
               qiita: 15,
               hackernews: 18,
-              github: 9,
             }}
           />
         );
 
-        expect(screen.getByText("42")).toBeInTheDocument();
+        expect(screen.getByText("33")).toBeInTheDocument();
         expect(screen.getByText("15")).toBeInTheDocument();
         expect(screen.getByText("18")).toBeInTheDocument();
-        expect(screen.getByText("9")).toBeInTheDocument();
       });
     });
 
@@ -73,7 +70,7 @@ describe("SourceTabs", () => {
 
         // タブのラベルのみで数字がないことを確認
         const tabs = screen.getAllByRole("tab");
-        expect(tabs).toHaveLength(4);
+        expect(tabs).toHaveLength(3);
       });
     });
 
@@ -124,13 +121,6 @@ describe("SourceTabs", () => {
         expect(mockOnTabChange).toHaveBeenCalledWith("hackernews");
       });
 
-      it("githubタブをクリックするとonTabChangeが呼ばれること", () => {
-        render(<SourceTabs activeTab="all" onTabChange={mockOnTabChange} />);
-
-        fireEvent.click(screen.getByRole("tab", { name: /GitHub/i }));
-
-        expect(mockOnTabChange).toHaveBeenCalledWith("github");
-      });
     });
   });
 
@@ -155,13 +145,6 @@ describe("SourceTabs", () => {
 
         const hnTab = screen.getByRole("tab", { name: /HN/i });
         expect(hnTab).toHaveAttribute("aria-selected", "true");
-      });
-
-      it("GitHubタブがアクティブな場合に正しく表示されること", () => {
-        render(<SourceTabs activeTab="github" onTabChange={mockOnTabChange} />);
-
-        const githubTab = screen.getByRole("tab", { name: /GitHub/i });
-        expect(githubTab).toHaveAttribute("aria-selected", "true");
       });
     });
   });

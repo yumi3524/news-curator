@@ -30,17 +30,6 @@ const mockFavoriteArticles: Article[] = [
     score: 200,
     isFavorite: true,
   },
-  {
-    id: '3',
-    title: 'Next.jsリポジトリ',
-    description: 'Next.jsのソースコード',
-    url: 'https://example.com/3',
-    publishedAt: '2024-01-03T00:00:00Z',
-    source: 'github',
-    tags: ['Next.js'],
-    stars: 1000,
-    isFavorite: true,
-  },
 ];
 
 // LocalStorageのモック
@@ -161,7 +150,7 @@ describe('Dashboard', () => {
         render(<Dashboard />);
 
         await waitFor(() => {
-          expect(screen.getAllByTestId('article-card').length).toBe(3);
+          expect(screen.getAllByTestId('article-card').length).toBe(2);
         });
       });
 
@@ -170,13 +159,13 @@ describe('Dashboard', () => {
         render(<Dashboard />);
 
         await waitFor(() => {
-          expect(screen.getAllByTestId('article-card').length).toBe(3);
+          expect(screen.getAllByTestId('article-card').length).toBe(2);
         });
 
         const allTab = screen.getByRole('tab', { name: /すべて/i });
         await user.click(allTab);
 
-        expect(screen.getAllByTestId('article-card').length).toBe(3);
+        expect(screen.getAllByTestId('article-card').length).toBe(2);
       });
 
       it('Qiitaタブをクリックするとqiita記事のみ表示されること', async () => {
@@ -184,7 +173,7 @@ describe('Dashboard', () => {
         render(<Dashboard />);
 
         await waitFor(() => {
-          expect(screen.getAllByTestId('article-card').length).toBe(3);
+          expect(screen.getAllByTestId('article-card').length).toBe(2);
         });
 
         const qiitaTab = screen.getByRole('tab', { name: /Qiita/i });

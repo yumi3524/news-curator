@@ -21,7 +21,7 @@ const meta = {
     onTabChange: { action: "tab changed" },
     activeTab: {
       control: "select",
-      options: ["all", "qiita", "hackernews", "github"],
+      options: ["all", "qiita", "hackernews"],
     },
   },
 } satisfies Meta<typeof SourceTabs>;
@@ -37,10 +37,9 @@ export const AllActive: Story = {
     activeTab: "all",
     onTabChange: () => {},
     counts: {
-      all: 42,
+      all: 33,
       qiita: 15,
       hackernews: 18,
-      github: 9,
     },
   },
 };
@@ -53,10 +52,9 @@ export const QiitaActive: Story = {
     activeTab: "qiita",
     onTabChange: () => {},
     counts: {
-      all: 42,
+      all: 33,
       qiita: 15,
       hackernews: 18,
-      github: 9,
     },
   },
 };
@@ -69,26 +67,9 @@ export const HackerNewsActive: Story = {
     activeTab: "hackernews",
     onTabChange: () => {},
     counts: {
-      all: 42,
+      all: 33,
       qiita: 15,
       hackernews: 18,
-      github: 9,
-    },
-  },
-};
-
-/**
- * GitHubタブがアクティブな状態
- */
-export const GitHubActive: Story = {
-  args: {
-    activeTab: "github",
-    onTabChange: () => {},
-    counts: {
-      all: 42,
-      qiita: 15,
-      hackernews: 18,
-      github: 9,
     },
   },
 };

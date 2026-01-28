@@ -39,7 +39,6 @@ type Story = StoryObj<typeof meta>;
 const availableSources: Array<{ id: Source; name: string }> = [
   { id: "qiita", name: "Qiita" },
   { id: "hackernews", name: "Hacker News" },
-  { id: "github", name: "GitHub" },
 ];
 
 /**
@@ -68,7 +67,7 @@ export const WithFiltersApplied: Story = {
     availableSources,
     availableTags: ["React", "JavaScript", "TypeScript", "Next.js", "Frontend"],
     filters: {
-      selectedSources: ["qiita", "github"],
+      selectedSources: ["qiita", "hackernews"],
       selectedTags: ["React", "TypeScript"],
       searchKeyword: "hooks",
     },
@@ -155,7 +154,7 @@ export const ManyTags: Story = {
       "DevOps",
     ],
     filters: {
-      selectedSources: ["qiita", "github"],
+      selectedSources: ["qiita", "hackernews"],
       selectedTags: ["React", "TypeScript", "Next.js", "Frontend"],
       searchKeyword: "",
     },
@@ -189,7 +188,7 @@ export const AllSelected: Story = {
     availableSources,
     availableTags: ["React", "JavaScript", "TypeScript", "Next.js", "Frontend"],
     filters: {
-      selectedSources: ["qiita", "hackernews", "github"],
+      selectedSources: ["qiita", "hackernews"],
       selectedTags: ["React", "JavaScript", "TypeScript", "Next.js", "Frontend"],
       searchKeyword: "tutorial",
     },

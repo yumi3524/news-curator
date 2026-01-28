@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { QiitaAPIFetcher } from "@/app/lib/fetchers/qiita-api";
 import { QiitaRSSFetcher } from "@/app/lib/fetchers/qiita";
 import { HackerNewsFetcher } from "@/app/lib/fetchers/hackernews";
-import { GitHubFetcher } from "@/app/lib/fetchers/github";
 import { CacheFetcher } from "@/app/lib/fetchers/cache";
 import type { ArticleFetcher, ExternalArticle, FetchOptions } from "@/app/lib/fetchers/types";
 import {
@@ -20,11 +19,11 @@ import { CACHE_KEYS, type ArticleCacheMeta, type Source } from "@/app/types/type
  *
  * GET /api/articles
  * GET /api/articles?tags=React,TypeScript
- * GET /api/articles?sources=qiita,hackernews,github
+ * GET /api/articles?sources=qiita,hackernews
  *
  * クエリパラメータ:
  * - tags: カンマ区切りのタグ（OR検索）
- * - sources: カンマ区切りのソース（qiita, hackernews, github）
+ * - sources: カンマ区切りのソース（qiita, hackernews）
  * - limit: 各ソースからの取得件数（デフォルト: 20）
  *
  * データソース切り替え:
@@ -32,8 +31,8 @@ import { CACHE_KEYS, type ArticleCacheMeta, type Source } from "@/app/types/type
  * - sourcesパラメータで複数ソース指定可能
  */
 
-type ArticleSource = "cache" | "qiita-rss" | "qiita-api" | "hackernews" | "github";
-type SourceType = "qiita" | "hackernews" | "github";
+type ArticleSource = "cache" | "qiita-rss" | "qiita-api" | "hackernews";
+type SourceType = "qiita" | "hackernews";
 
 function createFetcher(source: ArticleSource): ArticleFetcher {
   switch (source) {
@@ -43,8 +42,6 @@ function createFetcher(source: ArticleSource): ArticleFetcher {
       return new QiitaRSSFetcher();
     case "hackernews":
       return new HackerNewsFetcher();
-    case "github":
-      return new GitHubFetcher();
     case "cache":
     default:
       return new CacheFetcher();
@@ -60,8 +57,6 @@ function sourceToFetcherName(source: SourceType): ArticleSource {
       return "qiita-api";
     case "hackernews":
       return "hackernews";
-    case "github":
-      return "github";
     default:
       return "qiita-api";
   }
@@ -124,7 +119,7 @@ export async function GET(request: Request) {
   // 使用するソースを決定
   const sourcesToUse: SourceType[] = requestedSources && requestedSources.length > 0
     ? requestedSources
-    : ["qiita", "hackernews", "github"];
+    : ["qiita", "hackernews"];
 
   // キャッシュキーを決定（ソース指定がある場合は個別キー、なければ全体キー）
   const cacheKey = requestedSources && requestedSources.length === 1
@@ -180,7 +175,6 @@ export async function GET(request: Request) {
       counts: {
         qiita: articles.filter((a) => a.source === "qiita").length,
         hackernews: articles.filter((a) => a.source === "hackernews").length,
-        github: articles.filter((a) => a.source === "github").length,
         total: articles.length,
       },
     };

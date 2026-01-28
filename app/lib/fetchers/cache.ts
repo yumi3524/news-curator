@@ -34,10 +34,9 @@ export class CacheFetcher implements ArticleFetcher {
    */
   private mapCacheToExternal(article: CacheArticle): ExternalArticle {
     // キャッシュのsource文字列をSource型に変換
-    const sourceMap: Record<string, 'qiita' | 'hackernews' | 'github'> = {
+    const sourceMap: Record<string, 'qiita' | 'hackernews'> = {
       'qiita': 'qiita',
       'hackernews': 'hackernews',
-      'github': 'github',
     };
     const source = sourceMap[article.source] || 'qiita';
 

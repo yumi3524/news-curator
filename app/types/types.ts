@@ -1,11 +1,11 @@
 /**
  * データソース型（型安全なリテラル型）
  */
-export type Source = 'qiita' | 'hackernews' | 'github';
+export type Source = 'qiita' | 'hackernews';
 
 /**
  * 記事データ構造
- * 3つのAPI（Qiita/HN/GitHub）を統一的に扱う共通型
+ * 2つのAPI（Qiita/HN）を統一的に扱う共通型
  */
 export interface Article {
   id: string;
@@ -32,11 +32,6 @@ export interface Article {
   // Hacker News固有
   score?: number;
   commentsCount?: number;
-
-  // GitHub固有
-  stars?: number;
-  forks?: number;
-  language?: string;
 
   // UI状態（クライアント側で付与）
   isFavorite?: boolean;
@@ -126,6 +121,7 @@ export const USER_STORAGE_KEYS = {
   BOOKMARKS: 'user:bookmarks',
   STATS: 'user:stats',
   PREFERENCES: 'user:preferences',
+  CATEGORIES: 'user:categories',
 } as const;
 
 export const CACHE_KEYS = {
@@ -133,17 +129,14 @@ export const CACHE_KEYS = {
   ARTICLES_ALL: 'cache:articles:all',
   ARTICLES_QIITA: 'cache:articles:qiita',
   ARTICLES_HACKERNEWS: 'cache:articles:hackernews',
-  ARTICLES_GITHUB: 'cache:articles:github',
   ARTICLES_META: 'cache:articles:meta',
-  // 翻訳キャッシュ
-  TRANSLATION_PREFIX: 'cache:translation:',
+  // 翻訳キャッシュ（v2: モックキャッシュ無効化のためプレフィックス変更）
+  TRANSLATION_PREFIX: 'cache:translation:v2:',
   // 後方互換性のため残す（非推奨）
   /** @deprecated ARTICLES_QIITA を使用 */
   QIITA_ARTICLES: 'cache:qiita',
   /** @deprecated ARTICLES_HACKERNEWS を使用 */
   HN_ARTICLES: 'cache:hackernews',
-  /** @deprecated ARTICLES_GITHUB を使用 */
-  GITHUB_ARTICLES: 'cache:github',
   /** @deprecated ARTICLES_META を使用 */
   LAST_FETCH: 'cache:lastFetch',
 } as const;
@@ -167,7 +160,22 @@ export interface ArticleCacheMeta {
   counts: {
     qiita: number;
     hackernews: number;
-    github: number;
     total: number;
   };
+}
+
+// ========================================
+// カテゴリ関連型
+// ========================================
+
+import type { CategoryId } from '@/app/lib/categoryMapping';
+export type { CategoryId };
+
+/**
+ * ユーザーのカテゴリ選択設定
+ */
+export interface UserCategoryPreferences {
+  selectedCategories: CategoryId[];
+  isOnboardingCompleted: boolean;
+  updatedAt: string; // ISO 8601
 }
