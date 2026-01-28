@@ -1,13 +1,55 @@
 'use client';
 
 import { useState } from 'react';
-import { Heart, Bookmark, Clock, MessageCircle, Star, GitFork, Languages } from 'lucide-react';
+import { Heart, Bookmark, Clock, MessageCircle, Star, Languages } from 'lucide-react';
 import type { Article } from '../types/types';
 import { MAX_TAGS_TO_DISPLAY_MOBILE } from '../lib/constants';
 import { SOURCE_DISPLAY_NAMES, SOURCE_COLOR_VARS } from '../lib/constants/source';
 import { useTagClickHandler } from '../lib/hooks/useTagClickHandler';
 import { Tag } from './Tag';
 import { Badge } from './Badge';
+
+/** 翻訳切り替えボタンのスタイル定数 */
+const TRANSLATION_STYLES = {
+  active: {
+    background: 'rgba(232, 139, 90, 0.15)',
+    color: 'var(--color-hackernews)',
+    border: '1px solid rgba(232, 139, 90, 0.25)',
+  },
+  inactive: {
+    background: 'rgba(100, 100, 100, 0.15)',
+    color: 'var(--color-text-tertiary)',
+    border: '1px solid rgba(100, 100, 100, 0.25)',
+  },
+} as const;
+
+interface TranslationToggleButtonProps {
+  showTranslated: boolean;
+  onToggle: () => void;
+}
+
+function TranslationToggleButton({ showTranslated, onToggle }: TranslationToggleButtonProps): React.ReactElement {
+  const styles = showTranslated ? TRANSLATION_STYLES.active : TRANSLATION_STYLES.inactive;
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onToggle();
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold rounded-[6px] transition-colors hover:opacity-80"
+      style={styles}
+      aria-label={showTranslated ? '原文を表示' : '翻訳を表示'}
+      data-testid="translation-toggle"
+    >
+      <Languages className="w-2.5 h-2.5" />
+      {showTranslated ? '翻訳' : '原文'}
+    </button>
+  );
+}
 
 interface ArticleCardProps {
   article: Article;
@@ -66,17 +108,6 @@ export function ArticleCard({
             )}
             {article.commentsCount !== undefined && (
               <Badge icon={<MessageCircle className="h-3.5 w-3.5" />} label={article.commentsCount} />
-            )}
-          </>
-        );
-      case 'github':
-        return (
-          <>
-            {article.stars !== undefined && (
-              <Badge icon={<Star className="h-3.5 w-3.5" />} label={article.stars} />
-            )}
-            {article.forks !== undefined && (
-              <Badge icon={<GitFork className="h-3.5 w-3.5" />} label={article.forks} />
             )}
           </>
         );
@@ -141,32 +172,10 @@ export function ArticleCard({
           {/* Reading time + Translated badge + Favorite button */}
           <div className="flex items-center gap-2 shrink-0">
             {article.isTranslated && (
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setShowTranslated((prev) => !prev);
-                }}
-                className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold rounded-[6px] transition-colors hover:opacity-80"
-                style={{
-                  background: showTranslated
-                    ? 'rgba(232, 139, 90, 0.15)'
-                    : 'rgba(100, 100, 100, 0.15)',
-                  color: showTranslated
-                    ? 'var(--color-hackernews)'
-                    : 'var(--color-text-tertiary)',
-                  border: `1px solid ${
-                    showTranslated
-                      ? 'rgba(232, 139, 90, 0.25)'
-                      : 'rgba(100, 100, 100, 0.25)'
-                  }`,
-                }}
-                aria-label={showTranslated ? '原文を表示' : '翻訳を表示'}
-                data-testid="translation-toggle"
-              >
-                <Languages className="w-2.5 h-2.5" />
-                {showTranslated ? '翻訳' : '原文'}
-              </button>
+              <TranslationToggleButton
+                showTranslated={showTranslated}
+                onToggle={() => setShowTranslated((prev) => !prev)}
+              />
             )}
             {article.readingTimeMinutes && (
               <span

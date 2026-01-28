@@ -21,14 +21,13 @@ interface SourceTabsProps {
     all?: number;
     qiita?: number;
     hackernews?: number;
-    github?: number;
   };
 }
 
 /**
  * ソース切り替えタブコンポーネント
  *
- * Qiita、Hacker News、GitHubのソース別表示を切り替えます。
+ * Qiita、Hacker Newsのソース別表示を切り替えます。
  */
 export function SourceTabs({
   activeTab,
@@ -39,7 +38,6 @@ export function SourceTabs({
     { id: "all", label: "すべて", count: counts?.all },
     { id: "qiita", label: "Qiita", count: counts?.qiita },
     { id: "hackernews", label: "HN", count: counts?.hackernews },
-    { id: "github", label: "GitHub", count: counts?.github },
   ];
 
   return (
