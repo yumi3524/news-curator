@@ -5,6 +5,15 @@ import { HackerNewsFetcher } from "@/app/lib/fetchers/hackernews";
 import { GitHubFetcher } from "@/app/lib/fetchers/github";
 import { CacheFetcher } from "@/app/lib/fetchers/cache";
 import type { ArticleFetcher, ExternalArticle, FetchOptions } from "@/app/lib/fetchers/types";
+import {
+  getArticleCache,
+  setArticleCache,
+  getCacheMeta,
+  setCacheMeta,
+  getSourceCacheKey,
+} from "@/app/lib/cache/redis";
+import { ARTICLE_CACHE_TTL_SECONDS } from "@/app/lib/constants";
+import { CACHE_KEYS, type ArticleCacheMeta, type Source } from "@/app/types/types";
 
 /**
  * 記事取得API
@@ -100,6 +109,9 @@ export async function GET(request: Request) {
   const limitParam = searchParams.get("limit");
   const limit = limitParam ? parseInt(limitParam, 10) : 20;
 
+  // キャッシュ無効化フラグ（開発用）
+  const forceRefresh = searchParams.get("refresh") === "true";
+
   // 後方互換性: 単一tagパラメータもサポート
   const singleTag = searchParams.get("tag") || undefined;
   const finalTags = tags || (singleTag ? [singleTag] : undefined);
@@ -109,38 +121,95 @@ export async function GET(request: Request) {
     limit,
   };
 
+  // 使用するソースを決定
+  const sourcesToUse: SourceType[] = requestedSources && requestedSources.length > 0
+    ? requestedSources
+    : ["qiita", "hackernews", "github"];
+
+  // キャッシュキーを決定（ソース指定がある場合は個別キー、なければ全体キー）
+  const cacheKey = requestedSources && requestedSources.length === 1
+    ? getSourceCacheKey(requestedSources[0] as Source)
+    : CACHE_KEYS.ARTICLES_ALL;
+
   try {
-    let articles: ExternalArticle[];
-    let usedSources: string[];
+    // 1. キャッシュ確認（forceRefresh時はスキップ）
+    if (!forceRefresh) {
+      const cached = await getArticleCache(cacheKey);
+      if (cached && cached.length > 0) {
+        // キャッシュヒット: タグフィルタリングを適用して返却
+        let filteredArticles = cached;
+        if (finalTags && finalTags.length > 0) {
+          const tagsLower = finalTags.map((t) => t.toLowerCase());
+          filteredArticles = cached.filter((article) =>
+            article.tags.some((tag) => tagsLower.includes(tag.toLowerCase()))
+          );
+        }
 
-    if (requestedSources && requestedSources.length > 0) {
-      // 複数ソースから取得
-      articles = await fetchFromMultipleSources(requestedSources, fetchOptions);
-      usedSources = requestedSources;
-    } else {
-      // 環境変数で指定されたソース、またはすべてのソースから取得
-      const envSource = process.env.ARTICLE_SOURCE as ArticleSource | undefined;
+        const meta = await getCacheMeta(CACHE_KEYS.ARTICLES_META);
 
-      if (envSource && envSource !== "cache") {
-        // 単一ソースモード
-        const fetcher = createFetcher(envSource);
-        articles = await fetcher.fetch(fetchOptions);
-        usedSources = [envSource];
-      } else {
-        // デフォルト: すべてのソースから取得
-        const allSources: SourceType[] = ["qiita", "hackernews", "github"];
-        articles = await fetchFromMultipleSources(allSources, fetchOptions);
-        usedSources = allSources;
+        return NextResponse.json({
+          articles: filteredArticles,
+          sources: sourcesToUse,
+          count: filteredArticles.length,
+          fromCache: true,
+          cachedAt: meta?.fetchedAt || null,
+        });
       }
     }
 
+    // 2. キャッシュミス or 強制更新: 外部APIから取得
+    let articles: ExternalArticle[];
+
+    const envSource = process.env.ARTICLE_SOURCE as ArticleSource | undefined;
+    if (envSource && envSource !== "cache" && !requestedSources) {
+      // 単一ソースモード（環境変数指定）
+      const fetcher = createFetcher(envSource);
+      articles = await fetcher.fetch(fetchOptions);
+    } else {
+      // 複数ソースから取得
+      articles = await fetchFromMultipleSources(sourcesToUse, fetchOptions);
+    }
+
+    // 3. キャッシュに保存
+    await setArticleCache(cacheKey, articles, ARTICLE_CACHE_TTL_SECONDS);
+
+    // メタデータも保存
+    const meta: ArticleCacheMeta = {
+      fetchedAt: new Date().toISOString(),
+      sources: sourcesToUse as Source[],
+      counts: {
+        qiita: articles.filter((a) => a.source === "qiita").length,
+        hackernews: articles.filter((a) => a.source === "hackernews").length,
+        github: articles.filter((a) => a.source === "github").length,
+        total: articles.length,
+      },
+    };
+    await setCacheMeta(CACHE_KEYS.ARTICLES_META, meta, ARTICLE_CACHE_TTL_SECONDS);
+
     return NextResponse.json({
       articles,
-      sources: usedSources,
+      sources: sourcesToUse,
       count: articles.length,
+      fromCache: false,
+      cachedAt: meta.fetchedAt,
     });
   } catch (error) {
     console.error("Error in /api/articles:", error);
+
+    // エラー時: 古いキャッシュがあれば返却（Stale-while-revalidate）
+    const staleCache = await getArticleCache(cacheKey);
+    if (staleCache && staleCache.length > 0) {
+      console.warn("Returning stale cache due to fetch error");
+      return NextResponse.json({
+        articles: staleCache,
+        sources: sourcesToUse,
+        count: staleCache.length,
+        fromCache: true,
+        stale: true,
+        error: "Fetch failed, returning cached data",
+      });
+    }
+
     return NextResponse.json(
       {
         error: "Failed to fetch articles",
@@ -152,5 +221,6 @@ export async function GET(request: Request) {
 }
 
 // Next.js App Routerのキャッシング設定
-// 300秒（5分）ごとに再検証（revalidate）
-export const revalidate = 300;
+// Redisキャッシュを使用するため、revalidateは長めに設定（1時間）
+// 実際のキャッシュ制御はRedis側のTTL（25時間）で行う
+export const revalidate = 3600;

@@ -25,3 +25,6 @@ export const TRANSLATION_TARGET_LANG = 'ja';
 export const TRANSLATION_SOURCE_LANG = 'en';
 export const TRANSLATION_BATCH_SIZE = 10; // バッチ翻訳の最大件数
 export const TRANSLATION_CACHE_TTL_SECONDS = 30 * 24 * 60 * 60; // 30日間
+
+// 記事キャッシュ関連
+export const ARTICLE_CACHE_TTL_SECONDS = 25 * 60 * 60; // 25時間（1日 + バッファ1時間）

@@ -129,19 +129,45 @@ export const USER_STORAGE_KEYS = {
 } as const;
 
 export const CACHE_KEYS = {
+  // 記事キャッシュ
+  ARTICLES_ALL: 'cache:articles:all',
+  ARTICLES_QIITA: 'cache:articles:qiita',
+  ARTICLES_HACKERNEWS: 'cache:articles:hackernews',
+  ARTICLES_GITHUB: 'cache:articles:github',
+  ARTICLES_META: 'cache:articles:meta',
+  // 翻訳キャッシュ
+  TRANSLATION_PREFIX: 'cache:translation:',
+  // 後方互換性のため残す（非推奨）
+  /** @deprecated ARTICLES_QIITA を使用 */
   QIITA_ARTICLES: 'cache:qiita',
+  /** @deprecated ARTICLES_HACKERNEWS を使用 */
   HN_ARTICLES: 'cache:hackernews',
+  /** @deprecated ARTICLES_GITHUB を使用 */
   GITHUB_ARTICLES: 'cache:github',
+  /** @deprecated ARTICLES_META を使用 */
   LAST_FETCH: 'cache:lastFetch',
-  TRANSLATION_PREFIX: 'cache:translation:', // translation:{articleId}
 } as const;
 
 /**
- * 翻訳キャッシュデータ（Vercel KVに保存）
+ * 翻訳キャッシュデータ（Upstash Redisに保存）
  */
 export interface TranslationCache {
   articleId: string;
   titleJa: string;
   descriptionJa: string;
   translatedAt: string; // ISO 8601
+}
+
+/**
+ * 記事キャッシュメタデータ
+ */
+export interface ArticleCacheMeta {
+  fetchedAt: string; // ISO 8601
+  sources: Source[];
+  counts: {
+    qiita: number;
+    hackernews: number;
+    github: number;
+    total: number;
+  };
 }
