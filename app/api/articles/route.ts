@@ -13,6 +13,7 @@ import {
 } from "@/app/lib/cache/redis";
 import { ARTICLE_CACHE_TTL_SECONDS } from "@/app/lib/constants";
 import { CACHE_KEYS, type ArticleCacheMeta, type Source } from "@/app/types/types";
+import { translateTexts } from "@/app/lib/services/translation";
 
 /**
  * 記事取得API
@@ -165,7 +166,21 @@ export async function GET(request: Request) {
       articles = await fetchFromMultipleSources(sourcesToUse, fetchOptions);
     }
 
-    // 3. キャッシュに保存
+    // 3. HackerNews記事を翻訳
+    const hnArticles = articles.filter((a) => a.source === "hackernews" && !a.isTranslated);
+    if (hnArticles.length > 0) {
+      const textsToTranslate = hnArticles.flatMap((a) => [a.title, a.description]);
+      const translations = await translateTexts(textsToTranslate);
+
+      // 翻訳結果を記事に反映
+      hnArticles.forEach((article, index) => {
+        article.titleJa = translations[index * 2];
+        article.descriptionJa = translations[index * 2 + 1];
+        article.isTranslated = true;
+      });
+    }
+
+    // 4. キャッシュに保存（翻訳済み）
     await setArticleCache(cacheKey, articles, ARTICLE_CACHE_TTL_SECONDS);
 
     // メタデータも保存
