@@ -12,6 +12,9 @@ const meta = {
     },
   },
   tags: ['autodocs'],
+  args: {
+    onClick: () => {},
+  },
   argTypes: {
     onClick: { action: 'clicked' },
   },

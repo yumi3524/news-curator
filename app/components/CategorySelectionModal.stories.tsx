@@ -12,6 +12,10 @@ const meta = {
     },
   },
   tags: ['autodocs'],
+  args: {
+    onClose: () => {},
+    onComplete: () => {},
+  },
   argTypes: {
     onClose: { action: 'closed' },
     onComplete: { action: 'completed' },

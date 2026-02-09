@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useSyncExternalStore } from 'react';
 import { USER_STORAGE_KEYS } from '@/app/types/types';
 import type { UserCategoryPreferences, CategoryId } from '@/app/types/types';
 import { getTagsFromCategories } from '@/app/lib/categoryMapping';
@@ -11,25 +11,66 @@ const STORAGE_KEY = USER_STORAGE_KEYS.CATEGORIES;
 const DEFAULT_PREFERENCES: UserCategoryPreferences = {
   selectedCategories: [],
   isOnboardingCompleted: false,
-  updatedAt: new Date().toISOString(),
+  updatedAt: '',
 };
 
-/** LocalStorageから初期値を取得 */
-function getInitialPreferences(): UserCategoryPreferences {
-  if (typeof window === 'undefined') {
-    return { ...DEFAULT_PREFERENCES, updatedAt: new Date().toISOString() };
-  }
+/** キャッシュされたスナップショット */
+let cachedSnapshot: UserCategoryPreferences = DEFAULT_PREFERENCES;
 
+/** LocalStorageからカテゴリ設定を読み込み、キャッシュを更新 */
+function updateCachedSnapshot(): void {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
-      return JSON.parse(saved);
+      cachedSnapshot = JSON.parse(saved);
+    } else {
+      cachedSnapshot = DEFAULT_PREFERENCES;
     }
   } catch (e) {
     console.error('カテゴリ設定の読み込みエラー:', e);
+    cachedSnapshot = DEFAULT_PREFERENCES;
   }
+}
 
-  return { ...DEFAULT_PREFERENCES, updatedAt: new Date().toISOString() };
+/** クライアント用スナップショット取得（キャッシュを返す） */
+function getSnapshot(): UserCategoryPreferences {
+  return cachedSnapshot;
+}
+
+/** SSR時のスナップショット */
+function getServerSnapshot(): UserCategoryPreferences {
+  return DEFAULT_PREFERENCES;
+}
+
+/** 購読用のリスナー管理 */
+let listeners: Array<() => void> = [];
+
+function subscribe(listener: () => void): () => void {
+  // 初回購読時にLocalStorageから読み込み
+  if (listeners.length === 0) {
+    updateCachedSnapshot();
+  }
+  listeners = [...listeners, listener];
+  return () => {
+    listeners = listeners.filter((l) => l !== listener);
+  };
+}
+
+function emitChange(): void {
+  for (const listener of listeners) {
+    listener();
+  }
+}
+
+/** LocalStorageに保存してキャッシュを更新し、購読者に通知 */
+function savePreferences(prefs: UserCategoryPreferences): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+    cachedSnapshot = prefs;
+  } catch (e) {
+    console.error('カテゴリ設定の保存エラー:', e);
+  }
+  emitChange();
 }
 
 export interface UseCategoriesReturn {
@@ -55,55 +96,46 @@ export interface UseCategoriesReturn {
  * カテゴリ選択を管理するカスタムフック
  */
 export function useCategories(): UseCategoriesReturn {
-  const [preferences, setPreferences] = useState<UserCategoryPreferences>(getInitialPreferences);
-
-  /** 設定を更新してLocalStorageに保存する共通処理 */
-  const updatePreferences = useCallback(
-    (updater: (prev: UserCategoryPreferences) => Partial<UserCategoryPreferences>) => {
-      setPreferences((prev) => {
-        const newPrefs: UserCategoryPreferences = {
-          ...prev,
-          ...updater(prev),
-          updatedAt: new Date().toISOString(),
-        };
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(newPrefs));
-        } catch (e) {
-          console.error('カテゴリ設定の保存エラー:', e);
-        }
-        return newPrefs;
-      });
-    },
-    []
+  const preferences = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot
   );
 
-  const selectCategories = useCallback(
-    (categories: CategoryId[]) => {
-      updatePreferences(() => ({ selectedCategories: categories }));
-    },
-    [updatePreferences]
-  );
+  const selectCategories = useCallback((categories: CategoryId[]) => {
+    savePreferences({
+      ...cachedSnapshot,
+      selectedCategories: categories,
+      updatedAt: new Date().toISOString(),
+    });
+  }, []);
 
-  const toggleCategory = useCallback(
-    (categoryId: CategoryId) => {
-      updatePreferences((prev) => {
-        const current = prev.selectedCategories;
-        const newCategories = current.includes(categoryId)
-          ? current.filter((id) => id !== categoryId)
-          : [...current, categoryId];
-        return { selectedCategories: newCategories };
-      });
-    },
-    [updatePreferences]
-  );
+  const toggleCategory = useCallback((categoryId: CategoryId) => {
+    const newCategories = cachedSnapshot.selectedCategories.includes(categoryId)
+      ? cachedSnapshot.selectedCategories.filter((id) => id !== categoryId)
+      : [...cachedSnapshot.selectedCategories, categoryId];
+    savePreferences({
+      ...cachedSnapshot,
+      selectedCategories: newCategories,
+      updatedAt: new Date().toISOString(),
+    });
+  }, []);
 
   const clearCategories = useCallback(() => {
-    updatePreferences(() => ({ selectedCategories: [] }));
-  }, [updatePreferences]);
+    savePreferences({
+      ...cachedSnapshot,
+      selectedCategories: [],
+      updatedAt: new Date().toISOString(),
+    });
+  }, []);
 
   const completeOnboarding = useCallback(() => {
-    updatePreferences(() => ({ isOnboardingCompleted: true }));
-  }, [updatePreferences]);
+    savePreferences({
+      ...cachedSnapshot,
+      isOnboardingCompleted: true,
+      updatedAt: new Date().toISOString(),
+    });
+  }, []);
 
   const categoryTags = useMemo(
     () => getTagsFromCategories(preferences.selectedCategories),
