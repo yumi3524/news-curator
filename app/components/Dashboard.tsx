@@ -58,7 +58,6 @@ export function Dashboard() {
     all: favoriteArticles.length,
     qiita: favoriteArticles.filter((a) => a.source === 'qiita').length,
     hackernews: favoriteArticles.filter((a) => a.source === 'hackernews').length,
-    github: favoriteArticles.filter((a) => a.source === 'github').length,
   };
 
   return (

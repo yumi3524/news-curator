@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Newspaper, LayoutDashboard } from 'lucide-react';
 import { ThemeSwitcher } from './ThemeSwitcher';
+import { CategoryBadge } from './CategoryBadge';
+import type { CategoryId } from '@/app/types/types';
 
 /** ナビゲーションリンク */
 const navLinks = [
@@ -11,7 +13,12 @@ const navLinks = [
   { href: '/dashboard', label: 'ダッシュボード', icon: LayoutDashboard },
 ];
 
-export function Header() {
+interface HeaderProps {
+  selectedCategories?: CategoryId[];
+  onCategoryClick?: () => void;
+}
+
+export function Header({ selectedCategories = [], onCategoryClick }: HeaderProps) {
   const pathname = usePathname();
 
   return (
@@ -51,6 +58,12 @@ export function Header() {
               );
             })}
           </nav>
+          {onCategoryClick && (
+            <CategoryBadge
+              selectedCategories={selectedCategories}
+              onClick={onCategoryClick}
+            />
+          )}
           <ThemeSwitcher />
         </div>
       </div>

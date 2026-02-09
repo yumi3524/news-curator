@@ -23,7 +23,6 @@ describe("FilterPanel", () => {
   const mockAvailableSources: Array<{ id: Source; name: string }> = [
     { id: "qiita", name: "Qiita" },
     { id: "hackernews", name: "Hacker News" },
-    { id: "github", name: "GitHub" },
   ];
 
   const mockAvailableTags = [
@@ -80,7 +79,6 @@ describe("FilterPanel", () => {
 
         expect(screen.getByTestId("source-checkbox-qiita")).toBeInTheDocument();
         expect(screen.getByTestId("source-checkbox-hackernews")).toBeInTheDocument();
-        expect(screen.getByTestId("source-checkbox-github")).toBeInTheDocument();
       });
 
       it("すべてのタグが表示されること", () => {
@@ -203,18 +201,16 @@ describe("FilterPanel", () => {
 
       it("選択済みのソースはchecked状態になること", () => {
         renderFilterPanel({
-          selectedSources: ["qiita", "github"],
+          selectedSources: ["qiita", "hackernews"],
           selectedTags: [],
           searchKeyword: "",
         });
 
         const qiitaCheckbox = screen.getByTestId("source-checkbox-qiita") as HTMLInputElement;
         const hnCheckbox = screen.getByTestId("source-checkbox-hackernews") as HTMLInputElement;
-        const githubCheckbox = screen.getByTestId("source-checkbox-github") as HTMLInputElement;
 
         expect(qiitaCheckbox.checked).toBe(true);
-        expect(hnCheckbox.checked).toBe(false);
-        expect(githubCheckbox.checked).toBe(true);
+        expect(hnCheckbox.checked).toBe(true);
       });
     });
   });
@@ -305,7 +301,7 @@ describe("FilterPanel", () => {
 
       it("クリアボタンをクリックするとすべてのフィルタがリセットされること", () => {
         renderFilterPanel({
-          selectedSources: ["qiita", "github"],
+          selectedSources: ["qiita", "hackernews"],
           selectedTags: ["React", "TypeScript"],
           searchKeyword: "test",
         });
