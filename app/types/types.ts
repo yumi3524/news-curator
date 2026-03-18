@@ -4,10 +4,10 @@
 export type Source = 'qiita' | 'hackernews';
 
 /**
- * 記事データ構造
- * 2つのAPI（Qiita/HN）を統一的に扱う共通型
+ * 記事の共通フィールド
+ * Article / ExternalArticle の共通ベース型
  */
-export interface Article {
+export interface BaseArticle {
   id: string;
   title: string;
   description: string;
@@ -16,6 +16,7 @@ export interface Article {
   source: Source;
   author?: string;
   tags: string[];
+  imageUrl?: string;
 
   // 翻訳（Hacker News用）
   titleJa?: string;
@@ -32,10 +33,14 @@ export interface Article {
   // Hacker News固有
   score?: number;
   commentsCount?: number;
+}
 
+/**
+ * 記事データ構造（クライアント側）
+ */
+export interface Article extends BaseArticle {
   // UI状態（クライアント側で付与）
   isFavorite?: boolean;
-  imageUrl?: string;
 }
 
 /**
