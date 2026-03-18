@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Header } from './Header';
 import { FilterSection } from './FilterSection';
 import { FeaturedArticle } from './FeaturedArticle';
@@ -45,12 +45,8 @@ export function TechFeed() {
     handleRemoveFilter,
   } = useArticleFilter({ articles, categoryTags, hasSelectedCategories });
 
-  // 初回アクセス時にモーダル表示
-  useEffect(() => {
-    if (!isOnboardingCompleted) {
-      setIsCategoryModalOpen(true);
-    }
-  }, [isOnboardingCompleted]);
+  // オンボーディング未完了ならモーダルを表示
+  const showCategoryModal = isCategoryModalOpen || !isOnboardingCompleted;
 
   // パーソナルサーチハンドラ
   const handlePersonalSearch = useCallback(
@@ -126,7 +122,7 @@ export function TechFeed() {
         />
 
         <CategorySelectionModal
-          isOpen={isCategoryModalOpen}
+          isOpen={showCategoryModal}
           onClose={() => {
             if (isOnboardingCompleted) setIsCategoryModalOpen(false);
           }}
