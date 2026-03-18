@@ -6,6 +6,7 @@ import {
   MAX_DESCRIPTION_LENGTH,
   DEFAULT_DESCRIPTION,
 } from "../constants";
+import { stripHtml } from "../utils";
 
 /**
  * Hacker News API Response Types
@@ -97,7 +98,7 @@ export class HackerNewsFetcher implements ArticleFetcher {
     return stories.map((story) => {
       const hasText = story.text && story.text.trim().length > 0;
       const description = hasText
-        ? this.stripHtml(story.text!).substring(0, MAX_DESCRIPTION_LENGTH) + "..."
+        ? stripHtml(story.text!).substring(0, MAX_DESCRIPTION_LENGTH) + "..."
         : DEFAULT_DESCRIPTION;
 
       return {
@@ -113,13 +114,6 @@ export class HackerNewsFetcher implements ArticleFetcher {
         commentsCount: story.descendants || 0,
       };
     });
-  }
-
-  /**
-   * HTMLタグを除去
-   */
-  private stripHtml(html: string): string {
-    return html.replace(/<[^>]*>/g, "").trim();
   }
 
   /**

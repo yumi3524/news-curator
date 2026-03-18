@@ -1,17 +1,15 @@
 /**
- * 記事キャッシュ用 Upstash Redis プロバイダー
+ * Upstash Redis プロバイダー（共通）
  *
- * 翻訳キャッシュ（app/api/translate/route.ts）と同じパターンを採用
  * - 遅延初期化でリソース消費最小化
  * - Redis未設定時はnullを返却（フォールバック対応）
  * - エラー時はログ出力して継続
  */
 
 import { Redis } from '@upstash/redis';
-import type { ExternalArticle } from '../fetchers/types';
-import type { ArticleCacheMeta, Source } from '@/app/types/types';
+import type { Source } from '@/app/types/types';
 
-// Redisクライアント（遅延初期化）
+// Redisクライアント（遅延初期化・シングルトン）
 let redis: Redis | null = null;
 let redisInitialized = false;
 
@@ -19,7 +17,7 @@ let redisInitialized = false;
  * Redisクライアントを取得（遅延初期化）
  * 環境変数が設定されていない場合はnullを返す
  */
-function getRedis(): Redis | null {
+export function getRedis(): Redis | null {
   if (redisInitialized) return redis;
 
   const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
@@ -28,7 +26,7 @@ function getRedis(): Redis | null {
   redisInitialized = true;
 
   if (!url || !token) {
-    console.warn('Upstash Redis is not configured. Article caching is disabled.');
+    console.warn('Upstash Redis is not configured. Caching is disabled.');
     return null;
   }
 
@@ -37,72 +35,35 @@ function getRedis(): Redis | null {
 }
 
 /**
- * 記事キャッシュを取得
+ * ジェネリックなキャッシュ取得
  */
-export async function getArticleCache(
-  key: string
-): Promise<ExternalArticle[] | null> {
+export async function cacheGet<T>(key: string): Promise<T | null> {
   const client = getRedis();
   if (!client) return null;
 
   try {
-    return await client.get<ExternalArticle[]>(key);
+    return await client.get<T>(key);
   } catch (error) {
-    console.error('Redis get error (articles):', error);
+    console.error(`Redis get error [${key}]:`, error);
     return null;
   }
 }
 
 /**
- * 記事キャッシュを保存
+ * ジェネリックなキャッシュ保存
  */
-export async function setArticleCache(
+export async function cacheSet<T>(
   key: string,
-  articles: ExternalArticle[],
+  data: T,
   ttlSeconds: number
 ): Promise<void> {
   const client = getRedis();
   if (!client) return;
 
   try {
-    await client.set(key, articles, { ex: ttlSeconds });
+    await client.set(key, data, { ex: ttlSeconds });
   } catch (error) {
-    console.error('Redis set error (articles):', error);
-  }
-}
-
-/**
- * キャッシュメタデータを取得
- */
-export async function getCacheMeta(
-  key: string
-): Promise<ArticleCacheMeta | null> {
-  const client = getRedis();
-  if (!client) return null;
-
-  try {
-    return await client.get<ArticleCacheMeta>(key);
-  } catch (error) {
-    console.error('Redis get error (meta):', error);
-    return null;
-  }
-}
-
-/**
- * キャッシュメタデータを保存
- */
-export async function setCacheMeta(
-  key: string,
-  meta: ArticleCacheMeta,
-  ttlSeconds: number
-): Promise<void> {
-  const client = getRedis();
-  if (!client) return;
-
-  try {
-    await client.set(key, meta, { ex: ttlSeconds });
-  } catch (error) {
-    console.error('Redis set error (meta):', error);
+    console.error(`Redis set error [${key}]:`, error);
   }
 }
 
