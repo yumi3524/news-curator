@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import { Heart, Bookmark, Clock, MessageCircle, Star, Languages } from 'lucide-react';
-import type { Article } from '../types/types';
-import { MAX_TAGS_TO_DISPLAY_MOBILE } from '../lib/constants';
-import { SOURCE_DISPLAY_NAMES, SOURCE_COLOR_VARS } from '../lib/constants/source';
-import { useTagClickHandler } from '../lib/hooks/useTagClickHandler';
-import { Tag } from './Tag';
-import { Badge } from './Badge';
+import type { Article } from '@/app/types/types';
+import { MAX_TAGS_TO_DISPLAY_MOBILE } from '@/app/lib/constants';
+import { SOURCE_DISPLAY_NAMES, SOURCE_COLOR_VARS } from '@/app/lib/constants/source';
+import { useTagClickHandler } from '@/app/lib/hooks/useTagClickHandler';
+import { Tag } from '../ui/Tag';
+import { Badge } from '../ui/Badge';
 
 /** 翻訳切り替えボタンのスタイル定数 */
 const TRANSLATION_STYLES = {

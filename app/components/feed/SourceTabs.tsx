@@ -1,7 +1,7 @@
 "use client";
 
 import type { Source } from "@/app/types/types";
-import { SOURCE_COLOR_CLASSES } from "../lib/constants/source";
+import { SOURCE_COLOR_CLASSES } from "@/app/lib/constants/source";
 
 /** タブ情報 */
 interface TabItem {

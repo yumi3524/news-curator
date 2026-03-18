@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { ProgressBar } from "./ProgressBar";
+import { ProgressBar } from "../ProgressBar";
 
 /**
  * ProgressBarコンポーネントのStorybook

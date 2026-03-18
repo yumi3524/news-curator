@@ -1,10 +1,10 @@
 import { Heart, Bookmark, Calendar, Sparkles } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import type { Article } from '@/app/types/types';
-import { formatDate } from '../lib/utils';
-import { useTagClickHandler } from '../lib/hooks/useTagClickHandler';
-import { Tag } from './Tag';
-import { Badge } from './Badge';
+import { formatDate } from '@/app/lib/utils';
+import { useTagClickHandler } from '@/app/lib/hooks/useTagClickHandler';
+import { Tag } from '../ui/Tag';
+import { Badge } from '../ui/Badge';
 
 interface FeaturedArticleProps {
   article: Article;

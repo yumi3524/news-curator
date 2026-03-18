@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CategorySelectionModal } from '../CategorySelectionModal';
-import { CATEGORIES } from '../../lib/categoryMapping';
+import { CATEGORIES } from '@/app/lib/categoryMapping';
 
 const context = describe;
 

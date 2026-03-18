@@ -1,5 +1,5 @@
 import { Inbox } from 'lucide-react';
-import { StateMessage } from './StateMessage';
+import { StateMessage } from '../ui/StateMessage';
 
 export function EmptyState() {
   return (

@@ -2,10 +2,10 @@
 
 import { X, Plus, Search } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { Button } from './Button';
-import { Tag } from './Tag';
-import { Input } from './Input';
-import { Modal } from './Modal';
+import { Button } from '../ui/Button';
+import { Tag } from '../ui/Tag';
+import { Input } from '../ui/Input';
+import { Modal } from '../ui/Modal';
 import { toggleArrayItem } from '@/app/lib/utils';
 
 interface PersonalSearchModalProps {

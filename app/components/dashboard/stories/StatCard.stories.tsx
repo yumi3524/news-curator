@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { BookOpen, Flame, Bookmark, Clock } from "lucide-react";
-import { StatCard } from "./StatCard";
+import { StatCard } from "../StatCard";
 
 /**
  * StatCardコンポーネントのStorybook

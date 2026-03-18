@@ -2,9 +2,9 @@
 
 import { Sparkles } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from './Button';
-import { Modal } from './Modal';
-import { CATEGORIES, type CategoryId } from '../lib/categoryMapping';
+import { Button } from '../ui/Button';
+import { Modal } from '../ui/Modal';
+import { CATEGORIES, type CategoryId } from '@/app/lib/categoryMapping';
 import { toggleArrayItem } from '@/app/lib/utils';
 
 interface CategorySelectionModalContentProps {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { Header } from './Header';
+import { Header } from '../layout/Header';
 import { FilterSection } from './FilterSection';
 import { FeaturedArticle } from './FeaturedArticle';
 import { ArticleCard } from './ArticleCard';

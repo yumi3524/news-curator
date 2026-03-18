@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ArticleCard } from '../ArticleCard';
-import type { Article } from '../../types/types';
+import type { Article } from '@/app/types/types';
 
 const context = describe;
 

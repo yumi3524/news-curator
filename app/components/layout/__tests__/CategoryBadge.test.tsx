@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CategoryBadge } from '../CategoryBadge';
-import type { CategoryId } from '../../lib/categoryMapping';
+import type { CategoryId } from '@/app/lib/categoryMapping';
 
 const context = describe;
 

@@ -1,5 +1,5 @@
 import { TrendingUp, TrendingDown } from "lucide-react";
-import { TREND_COLOR_CLASSES, type TrendDirection } from "../lib/constants/source";
+import { TREND_COLOR_CLASSES, type TrendDirection } from "@/app/lib/constants/source";
 
 /** StatCardのProps */
 interface StatCardProps {

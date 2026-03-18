@@ -1,5 +1,5 @@
 import { AlertCircle } from 'lucide-react';
-import { StateMessage } from './StateMessage';
+import { StateMessage } from '../ui/StateMessage';
 
 interface ErrorStateProps {
   message?: string;
