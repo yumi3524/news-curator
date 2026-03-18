@@ -2,8 +2,8 @@
 
 import { Search, ChevronDown, ChevronUp, Filter, UserCircle } from 'lucide-react';
 import { useState } from 'react';
-import { Tag } from './Tag';
-import { Input } from './Input';
+import { Tag } from '../ui/Tag';
+import { Input } from '../ui/Input';
 
 interface TagCount {
   name: string;

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { StreakBadge } from "./StreakBadge";
+import { StreakBadge } from "../StreakBadge";
 
 /**
  * StreakBadgeコンポーネントのStorybook

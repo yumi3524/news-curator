@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { Dashboard } from './Dashboard';
+import { Dashboard } from '../Dashboard';
 
 /**
  * Dashboardコンポーネントのストーリー

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { SourceTabs } from "./SourceTabs";
+import { SourceTabs } from "../SourceTabs";
 
 /**
  * SourceTabsコンポーネントのStorybook

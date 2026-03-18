@@ -2,14 +2,14 @@
 
 import { useState } from 'react';
 import { BookOpen, Clock, TrendingUp, Flame, Heart } from 'lucide-react';
-import { Header } from './Header';
+import { Header } from '../layout/Header';
 import { StatCard } from './StatCard';
 import { ProgressBar } from './ProgressBar';
 import { StreakBadge } from './StreakBadge';
-import { SourceTabs } from './SourceTabs';
-import { ArticleCard } from './ArticleCard';
-import type { Source } from '../types/types';
-import { useFavorites } from '../lib/hooks/useFavorites';
+import { SourceTabs } from '../feed/SourceTabs';
+import { ArticleCard } from '../feed/ArticleCard';
+import type { Source } from '@/app/types/types';
+import { useFavorites } from '@/app/lib/hooks/useFavorites';
 
 /** ダッシュボード統計データ */
 interface DashboardStats {

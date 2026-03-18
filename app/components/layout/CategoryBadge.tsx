@@ -1,7 +1,7 @@
 'use client';
 
 import { Settings } from 'lucide-react';
-import { CATEGORIES, type CategoryId } from '../lib/categoryMapping';
+import { CATEGORIES, type CategoryId } from '@/app/lib/categoryMapping';
 
 interface CategoryBadgeProps {
   selectedCategories: CategoryId[];
