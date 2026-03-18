@@ -1,5 +1,6 @@
 import Parser from "rss-parser";
 import { ArticleFetcher, ExternalArticle, FetchOptions } from "./types";
+import { stripHtml } from "../utils";
 
 /**
  * Qiita RSSフェッチャー
@@ -48,7 +49,7 @@ export class QiitaRSSFetcher implements ArticleFetcher {
           return {
             id: articleId || `qiita-${Date.now()}-${index}`,
             title: item.title || "No Title",
-            description: this.stripHTML(item.contentSnippet || item.content || ""),
+            description: stripHtml(item.contentSnippet || item.content || "").substring(0, 200),
             url: item.link || "",
             publishedAt: item.isoDate || item.pubDate || new Date().toISOString(),
             source: 'qiita',
@@ -75,10 +76,4 @@ export class QiitaRSSFetcher implements ArticleFetcher {
     return match ? match[1] : "";
   }
 
-  /**
-   * HTML タグを除去してプレーンテキストに変換
-   */
-  private stripHTML(html: string): string {
-    return html.replace(/<[^>]*>/g, "").substring(0, 200);
-  }
 }

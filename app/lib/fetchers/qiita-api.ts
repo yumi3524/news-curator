@@ -1,4 +1,5 @@
 import { ArticleFetcher, ExternalArticle, FetchOptions, QiitaItem } from "./types";
+import { stripMarkdown } from "../utils";
 
 /**
  * Qiita API v2 フェッチャー
@@ -140,7 +141,7 @@ export class QiitaAPIFetcher implements ArticleFetcher {
    */
   private extractDescription(body?: string): string {
     if (!body) return "";
-    return this.stripMarkdown(body).substring(0, MAX_DESCRIPTION_LENGTH) + "...";
+    return stripMarkdown(body).substring(0, MAX_DESCRIPTION_LENGTH) + "...";
   }
 
   /**
@@ -167,26 +168,4 @@ export class QiitaAPIFetcher implements ArticleFetcher {
     });
   }
 
-  /**
-   * Markdownからプレーンテキストを抽出（簡易版）
-   * 記事の概要文生成に使用
-   */
-  private stripMarkdown(markdown: string): string {
-    return markdown
-      // ヘッダー行を削除
-      .replace(/^#+\s+.*$/gm, "")
-      // リンクを除去 [text](url) -> text
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-      // 画像を除去 ![alt](url) -> ""
-      .replace(/!\[[^\]]*\]\([^)]+\)/g, "")
-      // コードブロックを除去
-      .replace(/```[\s\S]*?```/g, "")
-      // インラインコードを除去
-      .replace(/`([^`]+)`/g, "$1")
-      // HTMLタグを除去
-      .replace(/<[^>]*>/g, "")
-      // 空行を削除
-      .replace(/\n\s*\n/g, "\n")
-      .trim();
-  }
 }

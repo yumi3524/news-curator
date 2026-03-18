@@ -3,10 +3,10 @@
  *
  * サーバーサイドで使用する翻訳機能を提供
  * - Google Translation APIを使用
- * - Upstash Redisによるキャッシュ
+ * - Upstash Redisによるキャッシュ（cache/redis.ts の共通クライアントを使用）
  */
 
-import { Redis } from '@upstash/redis';
+import { cacheGet, cacheSet } from '@/app/lib/cache/redis';
 import {
   GOOGLE_TRANSLATE_API_URL,
   TRANSLATION_TARGET_LANG,
@@ -25,25 +25,6 @@ interface GoogleTranslateResponse {
 }
 
 /**
- * Upstash Redisクライアント（遅延初期化）
- */
-let redis: Redis | null = null;
-let redisInitialized = false;
-
-function getRedis(): Redis | null {
-  if (redisInitialized) return redis;
-
-  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-
-  redisInitialized = true;
-  if (!url || !token) return null;
-
-  redis = new Redis({ url, token });
-  return redis;
-}
-
-/**
  * テキストからキャッシュキーを生成
  */
 function getCacheKey(text: string): string {
@@ -56,29 +37,14 @@ function getCacheKey(text: string): string {
  * キャッシュから翻訳を取得
  */
 async function getFromCache(key: string): Promise<string | null> {
-  const client = getRedis();
-  if (!client) return null;
-
-  try {
-    return await client.get<string>(key);
-  } catch (error) {
-    console.error('Translation cache get error:', error);
-    return null;
-  }
+  return cacheGet<string>(key);
 }
 
 /**
  * キャッシュに翻訳を保存
  */
 async function setToCache(key: string, value: string): Promise<void> {
-  const client = getRedis();
-  if (!client) return;
-
-  try {
-    await client.set(key, value, { ex: TRANSLATION_CACHE_TTL_SECONDS });
-  } catch (error) {
-    console.error('Translation cache set error:', error);
-  }
+  return cacheSet(key, value, TRANSLATION_CACHE_TTL_SECONDS);
 }
 
 /**

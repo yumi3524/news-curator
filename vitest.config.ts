@@ -13,6 +13,12 @@ export default defineConfig({
     projects: [
       // Regular component tests
       {
+        plugins: [react()],
+        resolve: {
+          alias: {
+            '@': path.resolve(dirname, './'),
+          },
+        },
         test: {
           name: 'components',
           environment: 'jsdom',

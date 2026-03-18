@@ -5,10 +5,8 @@ import { HackerNewsFetcher } from "@/app/lib/fetchers/hackernews";
 import { CacheFetcher } from "@/app/lib/fetchers/cache";
 import type { ArticleFetcher, ExternalArticle, FetchOptions } from "@/app/lib/fetchers/types";
 import {
-  getArticleCache,
-  setArticleCache,
-  getCacheMeta,
-  setCacheMeta,
+  cacheGet,
+  cacheSet,
   getSourceCacheKey,
 } from "@/app/lib/cache/redis";
 import { ARTICLE_CACHE_TTL_SECONDS } from "@/app/lib/constants";
@@ -130,7 +128,7 @@ export async function GET(request: Request) {
   try {
     // 1. キャッシュ確認（forceRefresh時はスキップ）
     if (!forceRefresh) {
-      const cached = await getArticleCache(cacheKey);
+      const cached = await cacheGet<ExternalArticle[]>(cacheKey);
       if (cached && cached.length > 0) {
         // キャッシュヒット: タグフィルタリングを適用して返却
         let filteredArticles = cached;
@@ -141,7 +139,7 @@ export async function GET(request: Request) {
           );
         }
 
-        const meta = await getCacheMeta(CACHE_KEYS.ARTICLES_META);
+        const meta = await cacheGet<ArticleCacheMeta>(CACHE_KEYS.ARTICLES_META);
 
         return NextResponse.json({
           articles: filteredArticles,
@@ -181,7 +179,7 @@ export async function GET(request: Request) {
     }
 
     // 4. キャッシュに保存（翻訳済み）
-    await setArticleCache(cacheKey, articles, ARTICLE_CACHE_TTL_SECONDS);
+    await cacheSet(cacheKey, articles, ARTICLE_CACHE_TTL_SECONDS);
 
     // メタデータも保存
     const meta: ArticleCacheMeta = {
@@ -193,7 +191,7 @@ export async function GET(request: Request) {
         total: articles.length,
       },
     };
-    await setCacheMeta(CACHE_KEYS.ARTICLES_META, meta, ARTICLE_CACHE_TTL_SECONDS);
+    await cacheSet(CACHE_KEYS.ARTICLES_META, meta, ARTICLE_CACHE_TTL_SECONDS);
 
     return NextResponse.json({
       articles,
@@ -206,7 +204,7 @@ export async function GET(request: Request) {
     console.error("Error in /api/articles:", error);
 
     // エラー時: 古いキャッシュがあれば返却（Stale-while-revalidate）
-    const staleCache = await getArticleCache(cacheKey);
+    const staleCache = await cacheGet<ExternalArticle[]>(cacheKey);
     if (staleCache && staleCache.length > 0) {
       console.warn("Returning stale cache due to fetch error");
       return NextResponse.json({
